@@ -1,48 +1,45 @@
 # SnapText — Task Backlog
 
-## P0 Foundation
-- [x] Verify repository and branch baseline.
-- [x] Add project charter, master plan, architecture, roadmap, backlog, decision log, risks, quality plan, progress log, and next-action handoff.
-- [x] Add React + TypeScript + Vite web app and Express API.
-- [x] Add GitHub Actions for install, migration, tests, typecheck, and build.
-- [x] Generate and commit the npm lockfile using npm's resolver; switch CI to npm ci.
+## P0 — Foundation (implemented on Draft PR)
+- [x] Project docs, React + TypeScript + Vite, Express + TypeScript, PostgreSQL, migrations and CI.
+- [x] Workspace/batch creation, private multi-image upload, per-image status and duplicate-content reporting.
+- [x] Bounded upload limits and private temporary staging with cleanup tests.
+- [x] Paginated workspace/batch/image list and detail APIs with scope/privacy tests.
+- [x] Genuine npm lockfile and npm ci in CI; passing workflow evidence recorded.
 
-## P1 Persistence and upload
-- [x] Add initial PostgreSQL schema for workspaces, extraction schemas, batches, images, records, fields, duplicate candidates, conflicts, and usage events.
-- [x] Add checksum-verified SQL migration runner and PostgreSQL readiness endpoint.
-- [x] Verify migration, API tests, typecheck, and build in GitHub Actions.
-- [x] Define BatchRepository interface and PostgreSQL repository implementation.
-- [x] Add workspace and batch creation endpoints.
-- [x] Add multi-image upload with server-side signature detection, SHA-256, private local storage, per-image status, and duplicate-content reporting.
-- [x] Use private temporary disk storage for multipart files rather than buffering all uploads in memory.
-- [x] Enforce configurable file count, per-file size, and combined request size limits.
-- [x] Add integration test for valid PNG, fake image content, duplicate content, and persisted batch count.
-- [x] Add integration test for combined request-size rejection and temporary-file cleanup.
-- [x] Connect web upload form to workspace, batch, and image APIs.
-- [x] Add paginated workspace, batch, and image list endpoints plus workspace/batch/image detail endpoints.
-- [x] Add persistence integration tests for pagination, parent scoping, not-found behavior, and storage-key privacy.
-- [ ] Add authentication and workspace authorization before any public/staging exposure.
+## P0 — Phase 1: SaaS identity and tenant isolation (next)
+- [ ] Inspect dependencies, migrations, route/service/repository conventions, frontend routing, and test fixtures.
+- [ ] Record ADR for maintained auth/session library, email verification and password-reset approach.
+- [ ] Add users, workspace memberships/roles, sessions, hashed verification/reset tokens, and audit events in a new migration.
+- [ ] Implement self-service register, email verification, login/logout, password reset and session revocation.
+- [ ] Add auth middleware and workspace authorization; client-provided IDs must not establish ownership.
+- [ ] Apply tenant scoping to every existing workspace/batch/image list/detail/create/upload API.
+- [ ] Add rate limits, secure cookie/CSRF strategy, security headers, safe config examples, and no-secret logging.
+- [ ] Test anonymous denial, cross-tenant IDOR read/write, token expiry/replay, session revocation, and regressions.
+- [ ] Update README/project docs and verify CI.
 
-## P2 OCR and extraction
-- [ ] Prepare synthetic/licensed benchmark images covering Vietnamese and English layouts.
-- [ ] Benchmark PaddleOCR and Tesseract for target languages/layouts.
-- [ ] Implement selected OCR adapter and schema-driven extraction.
-- [ ] Measure CER/WER and field accuracy; publish measured results.
+## P0 — Phase 2: Subscription and quotas
+- [ ] Define configurable plan/limit fields without inventing prices or customer-facing quota values.
+- [ ] Add versioned plans/prices, monthly/yearly intervals, subscription states, usage ledger, quota reservation/settlement.
+- [ ] Test atomic/concurrent quota checks, UTC periods, cancellation, past-due, expiry, failure release and exhaustion.
+- [ ] Expose plan/usage API and enforce entitlements server-side.
 
-## P3 AI fallback
-- [ ] Define fallback thresholds from observed OCR quality.
-- [ ] Add provider interface and mocked provider.
-- [ ] Add budgets, bounded retries, and usage audit.
-- [ ] Test budget exhaustion and provider failure.
+## P0 — Phase 3: Automated gateway
+- [ ] Compare merchant eligibility, VND/local methods, recurring support, signed webhooks, refunds, sandbox and fees.
+- [ ] Record gateway-selection ADR and obtain owner approval before provider-specific implementation.
+- [ ] Implement hosted checkout, signature-verified durable webhook inbox, idempotent processing and reconciliation.
+- [ ] Test replay/out-of-order events in sandbox; never grant entitlements from client redirects alone.
 
-## P4 Review and export
-- [ ] Build review/edit UI and persist edits.
-- [ ] Add non-destructive duplicate candidates and conflict resolution audit.
-- [ ] Generate combined CSV and XLSX.
-- [ ] Test Unicode, empty cells, row consistency, and formula injection.
+## P1 — Customer experience and processing
+- [ ] Signup/onboarding and dashboard with plan/usage, subscription state, batch history and clear quota errors.
+- [ ] Prepare synthetic/licensed Vietnamese and English OCR fixtures.
+- [ ] Benchmark PaddleOCR vs Tesseract and publish measured CER/WER, field accuracy and latency.
+- [ ] Implement schema-driven extraction and local OCR adapter.
+- [ ] Add budget-controlled AI fallback with mocked provider tests.
+- [ ] Build record/field review, persistent edits, provenance, duplicate/conflict review.
+- [ ] Generate consolidated CSV/XLSX and test Unicode, consistency and formula injection.
 
-## P5 Release readiness
-- [ ] Add end-to-end tests.
-- [ ] Write benchmark and deployment guides.
-- [ ] Add staging deployment and smoke test with GitHub secrets.
-- [ ] Validate backup/restore and operational limits.
+## P1 — Release readiness
+- [ ] E2E signup → plan → sandbox payment → quota → upload → process → review → export.
+- [ ] Add operational logs/metrics, backup/restore, privacy/retention and incident docs.
+- [ ] Staging only after tenant isolation passes; production deployment only after explicit owner approval.
