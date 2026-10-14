@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: snaptext-ci-${{ github.ref }}
+  group: snaptext-ci-${{ github.event.pull_request.head.ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -34,6 +34,8 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgresql://snaptext:snaptext@localhost:5432/snaptext
+      STORAGE_ROOT: ${{ runner.temp }}/snaptext-storage
+      UPLOAD_TEMP_ROOT: ${{ runner.temp }}/snaptext-upload-tmp
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,7 +46,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Apply database migrations
-        run: npm run db:migrate
+        run: npm run db:migrate && npm run db:migrate
       - name: Run API tests
         run: npm test
       - name: Typecheck

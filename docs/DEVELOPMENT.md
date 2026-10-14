@@ -36,7 +36,7 @@ curl -X POST http://localhost:3001/api/workspaces/WORKSPACE_ID/batches/BATCH_ID/
   -F "images=@./sample-2.jpg"
 ```
 
-The upload endpoint verifies file signatures rather than trusting the supplied filename or browser MIME type. It accepts PNG, JPEG, WEBP, GIF, TIFF, and BMP up to the configured per-file size and batch file-count limits. Files are written to private local storage using server-generated names; paths are not exposed by the API. Exact-content duplicates within one batch and unsupported files are returned in the `rejected` array, without silently merging records. Configure `STORAGE_ROOT` outside a public web root for deployment.
+The upload endpoint verifies file signatures rather than trusting the supplied filename or browser MIME type. It accepts PNG, JPEG, WEBP, GIF, TIFF, and BMP. Defaults are up to 20 files per request, 10 MB per file, and 100 MB combined request size; these can be configured using `UPLOAD_MAX_FILES`, `UPLOAD_MAX_FILE_SIZE_MB`, and `UPLOAD_MAX_TOTAL_SIZE_MB`. Multipart data is staged in private temporary disk storage (`UPLOAD_TEMP_ROOT`) and then moved to private permanent local storage (`STORAGE_ROOT`) using server-generated filenames. Keep both paths outside any public web root. Exact-content duplicates within one batch and unsupported files are returned in the `rejected` array rather than silently merged.
 
 ## Checks
 - `npm test` — API unit and integration tests.
@@ -45,4 +45,4 @@ The upload endpoint verifies file signatures rather than trusting the supplied f
 - `npm run db:migrate` — apply pending SQL migrations; applied migration checksums are verified.
 
 ## Current limitations
-OCR, AI fallback, schema-driven extraction, review/edit, duplicate-record comparison, conflict resolution, and combined CSV/XLSX export are not implemented yet. There is not yet user authentication or workspace authorization; treat this as a development preview only and do not expose it publicly or upload sensitive/production data. The upload UI remains disabled until the API and storage behavior have passed CI and the UI is wired to the endpoints.
+There is not yet user authentication or workspace authorization; do not expose this preview publicly or upload sensitive/production data. OCR, AI fallback, schema-driven extraction, review/edit, duplicate-record comparison, conflict resolution, and combined CSV/XLSX export are not implemented. Use synthetic/test images during development.

@@ -3,22 +3,23 @@
 ## 2026-10-14 — Foundation, PostgreSQL, and upload workflow
 - Initialized the project in repository seokillseo-byte/snaptext on branch foundation/project-bootstrap.
 - Added project charter, master plan, architecture, roadmap, backlog, decision log, risk register, test strategy, progress log, and next-action handoff.
-- Added React + TypeScript + Vite UI, Express API, health/readiness endpoints, PostgreSQL pool, SQL migration runner with SHA-256 migration checksums, and initial schema.
-- GitHub Actions run 37 passed: PostgreSQL service startup, migration, API tests, typecheck, and production build: https://github.com/seokillseo-byte/snaptext/actions/runs/38539095776
+- Added React + TypeScript + Vite UI, Express API, health/readiness endpoints, PostgreSQL pool, checksum-verified SQL migration runner, initial schema, and local PostgreSQL Compose service.
+- GitHub Actions run 37 passed: PostgreSQL startup, migration, API tests, typecheck, and build: https://github.com/seokillseo-byte/snaptext/actions/runs/38539095776
 - Added workspace and batch creation endpoints.
-- Added multi-image upload API with multipart limits, content-signature validation (PNG/JPEG/WEBP/GIF/TIFF/BMP), SHA-256 hashes, private local storage using server-generated filenames, per-image database records, and duplicate-content reporting.
-- Added an integration test covering upload of a PNG, rejection of fake image content, duplicate detection, and persisted image count.
-- Connected the React upload form to create a workspace and batch and display accepted/rejected file outcomes.
-- Added .snaptext-data/ to .gitignore and local API usage documentation.
-- The latest CI runs for upload and UI changes are still in progress at the time of this entry; do not claim them as passed until a completed run confirms success.
+- Added multi-image upload API with server-side image signature validation (PNG/JPEG/WEBP/GIF/TIFF/BMP), SHA-256, private storage using server-generated names, per-image records, and exact-content duplicate reporting.
+- Multipart files now use private temporary disk storage; request limits cover file count, per-file size, and total bytes. Temporary files are removed after processing.
+- Added repository contract and PostgreSQL implementation; service-layer SQL was moved into the repository.
+- Added an integration test covering a valid PNG, fake image content, duplicate content, and the persisted batch image count.
+- Connected the React upload form to workspace/batch creation and multi-image upload; the UI displays accepted and rejected outcomes.
+- Latest completed validation for the upload and repository changes: GitHub Actions run 79 passed migration, API tests, typecheck, and build: https://github.com/seokillseo-byte/snaptext/actions/runs/38584564365
+- A newer CI workflow now runs the migration twice to verify idempotence; its result is pending.
 
 ## Known gaps and safety limits
-- No authentication or workspace authorization exists yet. Do not expose the service publicly or use sensitive/production data.
-- Multer currently buffers uploaded files in memory. A total request-size limit or streaming/disk-backed multipart implementation is still required before public deployment.
-- The service currently contains SQL operations directly; repository abstraction/persistence tests are a follow-up task.
-- OCR, AI fallback, schema-driven extraction, review/edit, record-level deduplication/conflict resolution, and combined CSV/XLSX export are not implemented.
+- No authentication or workspace authorization exists yet. Do not expose the service publicly or upload sensitive/production data.
+- Combined request-size validation occurs after multipart files are written to private temporary disk storage. The configured count/per-file caps bound this staging usage, but production deployment still needs operational disk monitoring and rate limiting.
 - npm lockfile has not been committed; CI currently uses npm install.
-- No local runtime tests were executed in this chat session.
+- OCR, AI fallback, schema-driven extraction, review/edit, record-level duplicate/conflict resolution, and combined CSV/XLSX export are not implemented.
+- No local runtime tests were executed in this chat session; validation evidence comes from GitHub Actions.
 
 ## Entry format for each task
 - Scope and outcome

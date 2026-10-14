@@ -9,18 +9,18 @@
 
 ## P1 Persistence and upload
 - [x] Add initial PostgreSQL schema for workspaces, extraction schemas, batches, images, records, fields, duplicate candidates, conflicts, and usage events.
-- [x] Add checksum-verified SQL migration runner.
-- [x] Add PostgreSQL connection pool and readiness endpoint.
-- [x] Verify initial migration and API tests in GitHub Actions.
+- [x] Add checksum-verified SQL migration runner and PostgreSQL readiness endpoint.
+- [x] Verify migration, API tests, typecheck, and build in GitHub Actions.
+- [x] Define BatchRepository interface and PostgreSQL repository implementation.
 - [x] Add workspace and batch creation endpoints.
-- [x] Add multi-image upload endpoint with server-side signature detection, SHA-256, private local storage, per-image status, and exact-content duplicate reporting.
-- [x] Add upload integration test for valid image, spoofed extension/content, duplicate content, and persisted batch count.
+- [x] Add multi-image upload with server-side signature detection, SHA-256, private local storage, per-image status, and duplicate-content reporting.
+- [x] Use private temporary disk storage for multipart files rather than buffering all uploads in memory.
+- [x] Enforce configurable file count, per-file size, and combined request size limits.
+- [x] Add integration test for valid PNG, fake image content, duplicate bytes, and persisted batch count.
 - [x] Connect web upload form to workspace, batch, and image APIs.
-- [ ] Add explicit total-request byte limit or streaming-to-disk upload to reduce peak memory on large requests.
-- [ ] Extract repository interfaces/implementations from current service-level SQL.
+- [ ] Add tests for total upload limit and temporary-file cleanup on parser errors.
 - [ ] Add pagination/list/detail endpoints for workspaces, batches, and images.
 - [ ] Add authentication and workspace authorization before any public/staging exposure.
-- [ ] Verify latest CI after web integration and route response adjustments.
 
 ## P2 OCR and extraction
 - [ ] Prepare synthetic/licensed benchmark images covering Vietnamese and English layouts.
@@ -41,7 +41,7 @@
 - [ ] Test Unicode, empty cells, row consistency, and formula injection.
 
 ## P5 Release readiness
-- [ ] Add integration/end-to-end tests.
+- [ ] Add end-to-end tests.
 - [ ] Write benchmark and deployment guides.
 - [ ] Add staging deployment and smoke test with GitHub secrets.
 - [ ] Validate backup/restore and operational limits.
