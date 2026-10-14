@@ -51,6 +51,17 @@ function assertUuid(value: string, label: string): void {
   }
 }
 
+
+function normalizePagination(page: number, pageSize: number): { page: number; pageSize: number } {
+  if (!Number.isInteger(page) || page < 1 || page > 1_000_000) {
+    throw Object.assign(new Error("Page must be an integer between 1 and 1000000."), { statusCode: 400, code: "INVALID_PAGINATION" });
+  }
+  if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100) {
+    throw Object.assign(new Error("Page size must be an integer between 1 and 100."), { statusCode: 400, code: "INVALID_PAGINATION" });
+  }
+  return { page, pageSize };
+}
+
 export class BatchService {
   constructor(
     private readonly repository: BatchRepository,
@@ -63,6 +74,70 @@ export class BatchService {
       throw Object.assign(new Error("Workspace name must be between 1 and 160 characters."), { statusCode: 400, code: "INVALID_WORKSPACE_NAME" });
     }
     return this.repository.createWorkspace(normalizedName);
+  }
+
+
+  async getWorkspace(workspaceId: string) {
+    assertUuid(workspaceId, "Workspace ID");
+    const workspace = await this.repository.getWorkspace(workspaceId);
+    if (!workspace) {
+      throw Object.assign(new Error("Workspace was not found."), { statusCode: 404, code: "WORKSPACE_NOT_FOUND" });
+    }
+    return workspace;
+  }
+
+  async listWorkspaces(page = 1, pageSize = 20) {
+    const pagination = normalizePagination(page, pageSize);
+    const result = await this.repository.listWorkspaces(pagination.pageSize, (pagination.page - 1) * pagination.pageSize);
+    return {
+      items: result.items,
+      pagination: { ...pagination, total: result.total, totalPages: Math.ceil(result.total / pagination.pageSize) }
+    };
+  }
+
+  async listBatches(workspaceId: string, page = 1, pageSize = 20) {
+    assertUuid(workspaceId, "Workspace ID");
+    await this.getWorkspace(workspaceId);
+    const pagination = normalizePagination(page, pageSize);
+    const result = await this.repository.listBatches(workspaceId, pagination.pageSize, (pagination.page - 1) * pagination.pageSize);
+    return {
+      items: result.items,
+      pagination: { ...pagination, total: result.total, totalPages: Math.ceil(result.total / pagination.pageSize) }
+    };
+  }
+
+  async getBatch(workspaceId: string, batchId: string) {
+    assertUuid(workspaceId, "Workspace ID");
+    assertUuid(batchId, "Batch ID");
+    const batch = await this.repository.getBatch(workspaceId, batchId);
+    if (!batch) {
+      throw Object.assign(new Error("Batch was not found in this workspace."), { statusCode: 404, code: "BATCH_NOT_FOUND" });
+    }
+    return batch;
+  }
+
+  async listImages(workspaceId: string, batchId: string, page = 1, pageSize = 20) {
+    assertUuid(workspaceId, "Workspace ID");
+    assertUuid(batchId, "Batch ID");
+    await this.getBatch(workspaceId, batchId);
+    const pagination = normalizePagination(page, pageSize);
+    const result = await this.repository.listImages(workspaceId, batchId, pagination.pageSize, (pagination.page - 1) * pagination.pageSize);
+    return {
+      items: result.items,
+      pagination: { ...pagination, total: result.total, totalPages: Math.ceil(result.total / pagination.pageSize) }
+    };
+  }
+
+  async getImage(workspaceId: string, batchId: string, imageId: string) {
+    assertUuid(workspaceId, "Workspace ID");
+    assertUuid(batchId, "Batch ID");
+    assertUuid(imageId, "Image ID");
+    await this.getBatch(workspaceId, batchId);
+    const image = await this.repository.getImage(workspaceId, batchId, imageId);
+    if (!image) {
+      throw Object.assign(new Error("Image was not found in this batch."), { statusCode: 404, code: "IMAGE_NOT_FOUND" });
+    }
+    return image;
   }
 
   async createBatch(workspaceId: string, name: string) {
