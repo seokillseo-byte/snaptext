@@ -5,7 +5,7 @@
 - [x] Add project charter, master plan, architecture, roadmap, backlog, decision log, risks, quality plan, progress log, and next-action handoff.
 - [x] Add React + TypeScript + Vite web app and Express API.
 - [x] Add GitHub Actions for install, migration, tests, typecheck, and build.
-- [ ] Generate and commit npm lockfile; switch CI to npm ci.
+- [x] Generate and commit the npm lockfile using npm's resolver; switch CI to npm ci.
 
 ## P1 Persistence and upload
 - [x] Add initial PostgreSQL schema for workspaces, extraction schemas, batches, images, records, fields, duplicate candidates, conflicts, and usage events.
