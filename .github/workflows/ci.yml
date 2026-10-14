@@ -34,8 +34,8 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgresql://snaptext:snaptext@localhost:5432/snaptext
-      STORAGE_ROOT: ${{ runner.temp }}/snaptext-storage
-      UPLOAD_TEMP_ROOT: ${{ runner.temp }}/snaptext-upload-tmp
+      STORAGE_ROOT: .snaptext-data/images
+      UPLOAD_TEMP_ROOT: .snaptext-data/tmp
     steps:
       - name: Checkout
         uses: actions/checkout@v4
