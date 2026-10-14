@@ -16,7 +16,8 @@
     "dev:web": "npm --workspace @snaptext/web run dev",
     "test": "npm --workspace @snaptext/api test",
     "build": "npm --workspace @snaptext/api run build && npm --workspace @snaptext/web run build",
-    "typecheck": "npm --workspace @snaptext/api run typecheck && npm --workspace @snaptext/web run typecheck"
+    "typecheck": "npm --workspace @snaptext/api run typecheck && npm --workspace @snaptext/web run typecheck",
+    "db:migrate": "npm --workspace @snaptext/api run db:migrate"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
