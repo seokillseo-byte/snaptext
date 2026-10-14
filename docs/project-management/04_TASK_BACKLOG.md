@@ -1,29 +1,31 @@
 # SnapText — Task Backlog
 
 ## P0 Foundation
-- [x] Verify repository settings/default branch.
-- [x] Add project documentation and decision log.
-- [x] Add CI for install, tests, typecheck, and build.
-- [x] Add minimal frontend and API health endpoint.
-- [x] Add automated tests for API health.
-- [x] Add environment example and ignore secrets.
-- [x] Document local development.
-- [ ] Commit npm lockfile and switch CI to npm ci.
+- [x] Verify repository and branch baseline.
+- [x] Add project charter, master plan, architecture, roadmap, decision log, risks, quality plan, progress log, and next-action handoff.
+- [x] Add React + TypeScript + Vite web app and Express API.
+- [x] Add GitHub Actions for install, migration, tests, typecheck, and build.
+- [ ] Generate and commit npm lockfile; switch CI to npm ci.
 
 ## P1 Persistence and upload
-- [x] Add initial PostgreSQL schema for workspaces, schemas, batches, images, records, fields, duplicate candidates, conflicts, and usage events.
+- [x] Add initial PostgreSQL schema for workspaces, extraction schemas, batches, images, records, fields, duplicate candidates, conflicts, and usage events.
 - [x] Add checksum-verified SQL migration runner.
-- [x] Add database connection pool and readiness endpoint.
-- [ ] Verify migrations against PostgreSQL in GitHub Actions.
-- [ ] Add repository/service contracts and persistence tests.
-- [ ] Implement upload validation and private storage adapter.
-- [ ] Add batch/image upload and status endpoints.
-- [ ] Test file limits, actual MIME types, checksums, and partial failure.
+- [x] Add PostgreSQL connection pool and readiness endpoint.
+- [x] Verify initial migration and API tests in GitHub Actions.
+- [x] Add workspace and batch creation endpoints.
+- [x] Add multi-image upload endpoint with server-side signature detection, SHA-256, private local storage, per-image status, and exact-content duplicate reporting.
+- [x] Add upload integration test for valid image, spoofed extension/content, duplicate content, and persisted batch count.
+- [x] Connect web upload form to workspace, batch, and image APIs.
+- [ ] Add explicit total-request byte limit or streaming-to-disk upload to reduce peak memory on large requests.
+- [ ] Extract repository interfaces/implementations from current service-level SQL.
+- [ ] Add pagination/list/detail endpoints for workspaces, batches, and images.
+- [ ] Add authentication and workspace authorization before any public/staging exposure.
+- [ ] Verify latest CI after web integration and route response adjustments.
 
 ## P2 OCR and extraction
-- [ ] Prepare synthetic/licensed benchmark images.
+- [ ] Prepare synthetic/licensed benchmark images covering Vietnamese and English layouts.
 - [ ] Benchmark PaddleOCR and Tesseract for target languages/layouts.
-- [ ] Implement chosen OCR adapter and schema-driven extraction.
+- [ ] Implement selected OCR adapter and schema-driven extraction.
 - [ ] Measure CER/WER and field accuracy; publish measured results.
 
 ## P3 AI fallback
