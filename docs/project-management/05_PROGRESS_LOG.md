@@ -11,8 +11,8 @@
 - Added repository contract and PostgreSQL implementation; service-layer SQL was moved into the repository.
 - Added an integration test covering a valid PNG, fake image content, duplicate content, and the persisted batch image count.
 - Connected the React upload form to workspace/batch creation and multi-image upload; the UI displays accepted and rejected outcomes.
-- Latest completed validation for the upload and repository changes: GitHub Actions run 79 passed migration, API tests, typecheck, and build: https://github.com/seokillseo-byte/snaptext/actions/runs/38584564365
-- A newer CI workflow now runs the migration twice to verify idempotence; its result is pending.
+- GitHub Actions run 79 passed migration, API tests, typecheck, and build for the upload/repository implementation: https://github.com/seokillseo-byte/snaptext/actions/runs/38584564365
+- A later workflow edit intended to test migration idempotence twice caused a workflow-level failure before jobs started. The concurrency expression has been reverted to the previously validated form. The new run must confirm both migration executions and all checks before claiming the workflow change passed.
 
 ## Known gaps and safety limits
 - No authentication or workspace authorization exists yet. Do not expose the service publicly or upload sensitive/production data.
