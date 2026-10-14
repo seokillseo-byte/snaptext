@@ -15,6 +15,15 @@
 - Added an integration test forcing the combined request-size limit and verifying that no image rows persist and temporary files are removed. The first run exposed a response/cleanup race; the route was corrected to await cleanup before returning the 413 response.
 - Latest validation run 93 passed migrations twice, all API tests (including upload limit and cleanup), typecheck, and production build: https://github.com/seokillseo-byte/snaptext/actions/runs/38586320140
 
+
+## 2026-10-14 — Paginated read APIs
+- Added repository contracts and PostgreSQL queries for listing/detail retrieval of workspaces, batches, and source images.
+- Added API endpoints: `GET /api/workspaces`, `GET /api/workspaces/:workspaceId`, `GET /api/workspaces/:workspaceId/batches`, `GET /api/workspaces/:workspaceId/batches/:batchId`, `GET /api/workspaces/:workspaceId/batches/:batchId/images`, and `GET /api/workspaces/:workspaceId/batches/:batchId/images/:imageId`.
+- List endpoints support bounded `page` and `pageSize` pagination and return total/totalPages metadata. IDs and parent-child scope are checked; storage keys are not returned by read APIs.
+- Added PostgreSQL integration coverage for persisted pagination, detail retrieval, workspace/batch scope, invalid pagination, and storage-key privacy.
+- Validation status: changes were authored directly on GitHub; a fresh GitHub Actions result is still pending. No local runtime tests were run in this session.
+- npm lockfile remains pending. The execution environment could not reach GitHub to clone the repository and generate a genuine npm lockfile locally; dependency resolutions will not be fabricated.
+
 ## Known gaps and safety limits
 - No authentication or workspace authorization exists yet. Do not expose the service publicly or upload sensitive/production data.
 - Combined request-size validation occurs after multipart files have been staged to private temporary disk storage. Per-file and file-count caps bound staging usage, but production deployment still needs operational disk monitoring and rate limiting.
