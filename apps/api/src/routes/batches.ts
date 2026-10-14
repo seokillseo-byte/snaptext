@@ -13,8 +13,12 @@ const upload = multer({
     fileSize: (Number.isInteger(maxFileSizeMb) && maxFileSizeMb > 0 ? maxFileSizeMb : 15) * 1024 * 1024
   }
 });
-const service = new BatchService(getPool(), new LocalImageStorage());
+const storage = new LocalImageStorage();
 export const batchesRouter = Router();
+
+function service(): BatchService {
+  return new BatchService(getPool(), storage);
+}
 
 function routeError(error: unknown, response: import("express").Response): void {
   const candidate = error as { statusCode?: number; code?: string; message?: string };
@@ -30,7 +34,7 @@ function routeError(error: unknown, response: import("express").Response): void 
 batchesRouter.post("/workspaces", async (request, response) => {
   try {
     const name = typeof request.body?.name === "string" ? request.body.name : "";
-    const workspace = await service.createWorkspace(name);
+    const workspace = await service().createWorkspace(name);
     response.status(201).json({ data: workspace });
   } catch (error) {
     routeError(error, response);
@@ -40,7 +44,7 @@ batchesRouter.post("/workspaces", async (request, response) => {
 batchesRouter.post("/workspaces/:workspaceId/batches", async (request, response) => {
   try {
     const name = typeof request.body?.name === "string" ? request.body.name : "";
-    const batch = await service.createBatch(request.params.workspaceId, name);
+    const batch = await service().createBatch(request.params.workspaceId, name);
     response.status(201).json({ data: batch });
   } catch (error) {
     routeError(error, response);
@@ -52,7 +56,7 @@ batchesRouter.post(
   (request, response, next) => {
     upload.array("images", Number.isInteger(maxFiles) && maxFiles > 0 ? maxFiles : 50)(request, response, (error: unknown) => {
       if (error) {
-        const candidate = error as { code?: string; message?: string };
+        const candidate = error as { code?: string };
         const isLimit = candidate.code === "LIMIT_FILE_SIZE" || candidate.code === "LIMIT_FILE_COUNT";
         response.status(isLimit ? 413 : 400).json({
           error: {
@@ -68,7 +72,7 @@ batchesRouter.post(
   async (request, response) => {
     try {
       const files = (request.files ?? []) as Express.Multer.File[];
-      const result = await service.uploadImages(
+      const result = await service().uploadImages(
         request.params.workspaceId,
         request.params.batchId,
         files.map(toUploadedImage)
