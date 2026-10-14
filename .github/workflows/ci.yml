@@ -48,6 +48,14 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
+      - name: Bootstrap lockfile artifact (temporary)
+        if: hashFiles('package-lock.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: snaptext-npm-lockfile-bootstrap
+          path: package-lock.json
+          if-no-files-found: error
+          retention-days: 1
       - name: Apply database migrations
         run: npm run db:migrate && npm run db:migrate
       - name: Run API tests
