@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { readdir } from "node:fs/promises";
+import path from "node:path";
 import { after, test } from "node:test";
 import request from "supertest";
 import { app } from "./app.js";
@@ -64,6 +66,48 @@ test("workspace batch upload validates actual file content and flags duplicates"
     for (const row of storedImages.rows) {
       await storage.remove(row.storage_key);
     }
+  } finally {
+    if (workspaceId) {
+      await pool.query("DELETE FROM workspaces WHERE id = $1", [workspaceId]);
+    }
+  }
+});
+
+test("combined upload limit returns 413 and removes temporary files", {
+  skip: !databaseAvailable
+}, async () => {
+  const pool = getPool();
+  const tempRoot = path.resolve(process.env.UPLOAD_TEMP_ROOT ?? path.resolve(process.cwd(), ".snaptext-data/tmp"));
+  let workspaceId: string | undefined;
+
+  try {
+    const workspaceResponse = await request(app)
+      .post("/api/workspaces")
+      .send({ name: "Upload limit integration test" });
+    assert.equal(workspaceResponse.status, 201);
+    workspaceId = workspaceResponse.body.data.id;
+
+    const batchResponse = await request(app)
+      .post(`/api/workspaces/${workspaceId}/batches`)
+      .send({ name: "Oversized request test" });
+    assert.equal(batchResponse.status, 201);
+    const batchId = batchResponse.body.data.id;
+
+    const largePng = Buffer.concat([tinyPng, Buffer.alloc(600 * 1024, 0x20)]);
+    const response = await request(app)
+      .post(`/api/workspaces/${workspaceId}/batches/${batchId}/images`)
+      .attach("images", largePng, { filename: "large-a.png", contentType: "image/png" })
+      .attach("images", largePng, { filename: "large-b.png", contentType: "image/png" });
+
+    assert.equal(response.status, 413);
+    assert.equal(response.body.error.code, "UPLOAD_TOTAL_LIMIT_EXCEEDED");
+    assert.deepEqual(await readdir(tempRoot), []);
+
+    const imageCount = await pool.query<{ count: string }>(
+      "SELECT count(*) FROM source_images WHERE batch_id = $1",
+      [batchId]
+    );
+    assert.equal(Number(imageCount.rows[0].count), 0);
   } finally {
     if (workspaceId) {
       await pool.query("DELETE FROM workspaces WHERE id = $1", [workspaceId]);

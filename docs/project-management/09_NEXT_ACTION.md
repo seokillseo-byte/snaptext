@@ -4,7 +4,7 @@
 The foundation, PostgreSQL schema/migration, workspace and batch creation, multi-image upload, server-side image signature validation, SHA-256 duplicate detection, private permanent storage, disk-backed multipart staging, upload UI, and PostgreSQL repository contract are implemented on foundation/project-bootstrap. GitHub Actions run 84 passed migration twice, API tests, TypeScript checks, and production build.
 
 ## Immediate next action
-1. Add automated tests for combined request-size limits and temporary-file cleanup after multipart parser errors.
+1. Verify the new integration tests for combined upload-size rejection and temporary-file cleanup.
 2. Commit an npm lockfile and switch CI to npm ci.
 3. Add workspace, batch, and image list/detail endpoints with pagination and persistence tests.
 4. Add authentication and workspace authorization before any staging/public exposure.

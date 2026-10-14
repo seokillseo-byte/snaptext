@@ -16,9 +16,9 @@
 - [x] Add multi-image upload with server-side signature detection, SHA-256, private local storage, per-image status, and duplicate-content reporting.
 - [x] Use private temporary disk storage for multipart files rather than buffering all uploads in memory.
 - [x] Enforce configurable file count, per-file size, and combined request size limits.
-- [x] Add integration test for valid PNG, fake image content, duplicate bytes, and persisted batch count.
+- [x] Add integration test for valid PNG, fake image content, duplicate content, and persisted batch count.
+- [x] Add integration test for combined request-size rejection and temporary-file cleanup.
 - [x] Connect web upload form to workspace, batch, and image APIs.
-- [ ] Add tests for total upload limit and temporary-file cleanup on parser errors.
 - [ ] Add pagination/list/detail endpoints for workspaces, batches, and images.
 - [ ] Add authentication and workspace authorization before any public/staging exposure.
 
