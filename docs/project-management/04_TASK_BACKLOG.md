@@ -2,7 +2,7 @@
 
 ## P0 Foundation
 - [x] Verify repository and branch baseline.
-- [x] Add project charter, master plan, architecture, roadmap, decision log, risks, quality plan, progress log, and next-action handoff.
+- [x] Add project charter, master plan, architecture, roadmap, backlog, decision log, risks, quality plan, progress log, and next-action handoff.
 - [x] Add React + TypeScript + Vite web app and Express API.
 - [x] Add GitHub Actions for install, migration, tests, typecheck, and build.
 - [ ] Generate and commit npm lockfile; switch CI to npm ci.
@@ -19,7 +19,8 @@
 - [x] Add integration test for valid PNG, fake image content, duplicate content, and persisted batch count.
 - [x] Add integration test for combined request-size rejection and temporary-file cleanup.
 - [x] Connect web upload form to workspace, batch, and image APIs.
-- [ ] Add pagination/list/detail endpoints for workspaces, batches, and images.
+- [x] Add paginated workspace, batch, and image list endpoints plus workspace/batch/image detail endpoints.
+- [x] Add persistence integration tests for pagination, parent scoping, not-found behavior, and storage-key privacy.
 - [ ] Add authentication and workspace authorization before any public/staging exposure.
 
 ## P2 OCR and extraction
