@@ -1,8 +1,23 @@
 # SnapText
 
-SnapText is a web application for extracting structured records from multiple images, reviewing the results, resolving duplicates and conflicts, and exporting one consolidated dataset.
+SnapText is a web application being built to turn batches of images into one structured dataset, with source traceability, human review, duplicate/conflict handling, and consolidated CSV/XLSX export.
 
-## Product workflow
+## Current implementation
+
+Implemented and validated in GitHub Actions:
+- React + TypeScript + Vite web interface.
+- Express + TypeScript API with liveness and PostgreSQL readiness checks.
+- PostgreSQL schema and checksum-verified SQL migrations.
+- Workspace and batch creation.
+- Multi-image upload with server-side file signature validation for PNG, JPEG, WEBP, GIF, TIFF, and BMP.
+- SHA-256 content hashing and duplicate-image reporting within a batch.
+- Private local image storage and private temporary disk staging for multipart uploads.
+- Configurable file count, per-file size, and combined request-size limits.
+- Integration tests for valid image upload, fake image rejection, duplicate detection, request-size rejection, and temporary-file cleanup.
+
+The upload workflow is available in the development UI. OCR and extraction have not been implemented yet.
+
+## Planned product workflow
 
 1. Upload a batch of images.
 2. Run local OCR first.
@@ -12,21 +27,23 @@ SnapText is a web application for extracting structured records from multiple im
 6. Let users inspect and edit extracted data while preserving source provenance.
 7. Export the reviewed batch as one combined XLSX or CSV file.
 
-## Project status
+## Technology direction
 
-The repository is being initialized. Technology choices that have not been validated are tracked as proposals in `docs/project-management/06_DECISION_LOG.md`. Do not interpret a planned feature as implemented or tested until the relevant code and test evidence exist.
+The initial stack is React + TypeScript + Vite, Node.js + TypeScript, Express, and PostgreSQL. PaddleOCR and Tesseract remain candidates; the OCR engine must be selected using representative Vietnamese and English benchmark images. See `docs/project-management/06_DECISION_LOG.md` for confirmed decisions and proposals.
 
 ## Development
 
-The planned initial stack is React + TypeScript + Vite for the frontend, Node.js + TypeScript for the API, PostgreSQL for persistent data, and a local OCR engine selected through a benchmark. These are proposals until confirmed in the decision log.
+See [Local development guide](docs/DEVELOPMENT.md).
 
-## Documentation
+## Project management
 
-Project charter, architecture, roadmap, backlog, progress, decisions, risks, quality strategy, and next action live in `docs/project-management/`.
+Project charter, master plan, architecture, roadmap, backlog, progress, decisions, risks, quality strategy, and next action live in `docs/project-management/`.
 
-## Security
+## Security and limitations
 
+- There is no authentication or workspace authorization yet. Do not expose this development preview publicly or upload sensitive/production data.
+- Keep `STORAGE_ROOT` and `UPLOAD_TEMP_ROOT` outside any public web root.
 - Never commit API keys, passwords, production data, or private images.
 - Use synthetic or properly licensed sample images in automated tests.
-- Keep AI fallback disabled or mocked in CI unless explicitly configured with a safe test provider.
-- Do not silently discard uncertain or conflicting extracted records.
+- AI fallback remains disabled; OCR, schema-driven extraction, review/edit, record-level duplicate/conflict resolution, and consolidated CSV/XLSX export are not implemented.
+- npm lockfile and reproducible `npm ci` setup are pending.
