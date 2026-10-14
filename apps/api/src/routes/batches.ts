@@ -103,6 +103,7 @@ batchesRouter.post(
 
       const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
       if (totalBytes > safeMaxTotalBytes) {
+        await cleanupTempFiles(files);
         response.status(413).json({
           error: {
             code: "UPLOAD_TOTAL_LIMIT_EXCEEDED",
@@ -137,6 +138,7 @@ batchesRouter.post(
           });
         }
       }
+      await cleanupTempFiles(files);
       response.status(200).json({ data: { accepted, rejected } });
     } catch (error) {
       routeError(error, response);
