@@ -7,16 +7,17 @@
 - GitHub Actions run 37 passed: PostgreSQL startup, migration, API tests, typecheck, and build: https://github.com/seokillseo-byte/snaptext/actions/runs/38539095776
 - Added workspace and batch creation endpoints.
 - Added multi-image upload API with server-side image signature validation (PNG/JPEG/WEBP/GIF/TIFF/BMP), SHA-256, private storage using server-generated names, per-image records, and exact-content duplicate reporting.
-- Multipart files now use private temporary disk storage; request limits cover file count, per-file size, and total bytes. Temporary files are removed after processing.
-- Added repository contract and PostgreSQL implementation; service-layer SQL was moved into the repository.
-- Added an integration test covering a valid PNG, fake image content, duplicate content, and the persisted batch image count.
+- Multipart files use private temporary disk storage; configurable limits cover file count, per-file size, and combined request size. Temporary files are removed after processing.
+- Added BatchRepository contract and PostgreSQL implementation; service-layer SQL was moved into the repository.
+- Added integration coverage for a valid PNG, fake image content, duplicate content, and persisted batch image count.
 - Connected the React upload form to workspace/batch creation and multi-image upload; the UI displays accepted and rejected outcomes.
 - GitHub Actions run 79 passed migration, API tests, typecheck, and build for the upload/repository implementation: https://github.com/seokillseo-byte/snaptext/actions/runs/38584564365
-- A later workflow edit intended to test migration idempotence twice caused a workflow-level failure before jobs started. The concurrency expression has been reverted to the previously validated form. The new run must confirm both migration executions and all checks before claiming the workflow change passed.
+- A later workflow revision initially failed before job startup because runner.temp was referenced in job-level environment variables. The workflow was corrected to use configured private relative paths.
+- GitHub Actions run 84 passed both migration executions (idempotence check), API tests, TypeScript checks, and production build: https://github.com/seokillseo-byte/snaptext/actions/runs/38585487150
 
 ## Known gaps and safety limits
 - No authentication or workspace authorization exists yet. Do not expose the service publicly or upload sensitive/production data.
-- Combined request-size validation occurs after multipart files are written to private temporary disk storage. The configured count/per-file caps bound this staging usage, but production deployment still needs operational disk monitoring and rate limiting.
+- Combined request-size validation occurs after multipart files have been staged to private temporary disk storage. Per-file and file-count caps bound staging usage, but production deployment still needs operational disk monitoring and rate limiting.
 - npm lockfile has not been committed; CI currently uses npm install.
 - OCR, AI fallback, schema-driven extraction, review/edit, record-level duplicate/conflict resolution, and combined CSV/XLSX export are not implemented.
 - No local runtime tests were executed in this chat session; validation evidence comes from GitHub Actions.
