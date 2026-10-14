@@ -77,7 +77,7 @@ batchesRouter.post(
         request.params.batchId,
         files.map(toUploadedImage)
       );
-      response.status(result.accepted.length > 0 ? 201 : 422).json({ data: result });
+      response.status(200).json({ data: result });
     } catch (error) {
       routeError(error, response);
     }
