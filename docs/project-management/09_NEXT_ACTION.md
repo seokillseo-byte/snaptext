@@ -1,12 +1,14 @@
 # SnapText — Next Action
 
 ## Current status
-SnapText is a customer-facing SaaS: self-service signup, monthly/yearly subscriptions with server-enforced limits, and automated gateway payment. Foundation code includes React + TypeScript + Vite, Express + TypeScript, PostgreSQL migrations, private multi-image upload, and paginated workspace/batch/image APIs. PR #1 remains Draft/open; no merge or deployment without explicit approval.
+SnapText is a customer-facing SaaS: self-service signup, monthly/yearly subscriptions with server-enforced limits, and automated gateway payment. Foundation code includes React + TypeScript + Vite, Express + TypeScript, PostgreSQL migrations, private multi-image upload, and paginated workspace/batch/image APIs. Architecture and project plans are updated. ADR-001 records the identity/tenant-security direction. PR #1 remains Draft/open; no merge or deployment without explicit approval.
 
-## Immediate next action — Phase 1: Identity and tenant isolation
+## Immediate next action — Phase 1 (GitHub Issue #2): Identity and tenant isolation
+Issue: https://github.com/seokillseo-byte/snaptext/issues/2
+
 1. Inspect current dependencies, API route/service/repository layering, migration conventions, frontend routing, and test fixtures on branch foundation/project-bootstrap.
-2. Record an ADR for authentication/session strategy and email verification/password reset.
-3. Implement a secure vertical slice: users + workspace memberships/roles + sessions/tokens + auth endpoints + tenant authorization on existing routes.
+2. Finalize auth/session implementation details against the actual dependency tree; use maintained libraries and npm-generated lockfile updates.
+3. Implement users, workspace memberships/roles, sessions/tokens, self-service auth lifecycle, and authorization on every existing workspace/batch/image route.
 4. Add migrations only; do not rewrite existing migrations.
 5. Test anonymous access, cross-tenant IDOR reads/writes, token expiry/replay, session revocation, and existing workflow regressions.
 6. Update docs and run GitHub Actions. Do not begin payment integration until tenant security and plan/quota foundations are in place.
