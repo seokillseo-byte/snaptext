@@ -12,8 +12,9 @@
 - Added integration coverage for a valid PNG, fake image content, duplicate content, and persisted batch image count.
 - Connected the React upload form to workspace/batch creation and multi-image upload; the UI displays accepted and rejected outcomes.
 - GitHub Actions run 79 passed migration, API tests, typecheck, and build for the upload/repository implementation: https://github.com/seokillseo-byte/snaptext/actions/runs/38584564365
-- A later workflow revision initially failed before job startup because runner.temp was referenced in job-level environment variables. The workflow was corrected to use configured private relative paths.
+- A workflow revision initially failed before job startup because runner.temp was referenced in job-level environment variables. The workflow was corrected to use configured private relative paths.
 - GitHub Actions run 84 passed both migration executions (idempotence check), API tests, TypeScript checks, and production build: https://github.com/seokillseo-byte/snaptext/actions/runs/38585487150
+- Added a new integration test that forces the combined upload-size limit and asserts that temporary files are cleaned and no image rows are persisted. CI verification for this latest test is pending.
 
 ## Known gaps and safety limits
 - No authentication or workspace authorization exists yet. Do not expose the service publicly or upload sensitive/production data.
