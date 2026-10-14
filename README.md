@@ -17,6 +17,11 @@ Implemented and validated in GitHub Actions:
 
 The upload workflow is available in the development UI. OCR and extraction have not been implemented yet.
 
+### Latest branch additions — awaiting CI validation
+- Paginated workspace, batch, and image list endpoints with total-count metadata.
+- Workspace, batch, and image detail endpoints scoped to their parent resources.
+- PostgreSQL integration tests for pagination, parent scoping, not-found responses, and keeping storage keys private in API responses.
+
 ## Planned product workflow
 
 1. Upload a batch of images.
