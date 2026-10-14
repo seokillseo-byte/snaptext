@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: snaptext-ci-${{ github.event.pull_request.head.ref || github.ref_name }}
+  group: snaptext-ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
