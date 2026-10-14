@@ -17,7 +17,7 @@ Implemented and validated in GitHub Actions:
 
 The upload workflow is available in the development UI. OCR and extraction have not been implemented yet.
 
-### Latest branch additions — awaiting CI validation
+### Latest branch additions — CI validation pending for final npm ci workflow
 - Paginated workspace, batch, and image list endpoints with total-count metadata.
 - Workspace, batch, and image detail endpoints scoped to their parent resources.
 - PostgreSQL integration tests for pagination, parent scoping, not-found responses, and keeping storage keys private in API responses.
@@ -51,4 +51,4 @@ Project charter, master plan, architecture, roadmap, backlog, progress, decision
 - Never commit API keys, passwords, production data, or private images.
 - Use synthetic or properly licensed sample images in automated tests.
 - AI fallback remains disabled; OCR, schema-driven extraction, review/edit, record-level duplicate/conflict resolution, and consolidated CSV/XLSX export are not implemented.
-- npm lockfile and reproducible `npm ci` setup are pending.
+- `package-lock.json` is committed and CI uses `npm ci` for reproducible dependency installation.
