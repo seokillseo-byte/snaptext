@@ -1,50 +1,51 @@
 # SnapText — Master Plan
 
-## Phase 0 — Repository foundation
-- Project docs, decision records, branch/PR workflow, CI.
-- Minimal runnable frontend/API and tests.
-- Environment example and secret-handling rules.
-- Exit: reproducible install/build/test workflow.
+## Confirmed product decisions
+Customer-facing multi-tenant SaaS; self-service signup; monthly/yearly subscriptions with plan limits; automated gateway payment. No manual signup approval or wallet/credits in v1. Gateway, prices, quotas, and commercial policies remain unselected until evidence and owner approval.
 
-## Phase 1 — Persistence
-- Model batches, images, schemas, records, fields, provenance, duplicate candidates, conflicts, usage events.
-- PostgreSQL migrations; route handlers delegate to services.
-- Exit: migrations and repository tests verify constraints.
+## Phase 0 — Repository foundation (implemented; CI evidence recorded)
+React + TypeScript + Vite, Express + TypeScript, PostgreSQL, checksum-verified migrations, CI, workspace/batch creation, private multi-image upload, paginated workspace/batch/image APIs.
+Exit: reproducible install, migration, test, typecheck, and build.
 
-## Phase 2 — Upload and orchestration
-- Validate file count, MIME type, size, and safe filenames.
-- Store originals behind a private storage adapter.
-- Track images independently; make retries bounded and idempotent.
-- Exit: multi-image upload and failure isolation.
+## Phase 1 — Identity and tenant security (next, P0)
+- Inspect dependencies, routes/services/repositories, migrations, frontend routing, and tests.
+- Choose a maintained auth/session approach; document ADR.
+- Add users, workspace memberships/roles, sessions, hashed verification/reset tokens, and audit events.
+- Implement self-service registration, email verification, login/logout, password reset, session rotation/revocation, rate limits, and safe cookie/CSRF strategy.
+- Resolve workspace access from authenticated identity; apply authorization to all existing APIs.
+Exit: anonymous denial and cross-tenant read/write denial tests for every resource family; no tokens/secrets in logs.
 
-## Phase 3 — Local OCR and extraction
-- Benchmark PaddleOCR and Tesseract on representative target images before selecting.
-- Normalize OCR output to a provider-independent contract.
-- Extract schema fields conservatively; missing/uncertain values remain explicit.
-- Exit: adapter tests and reproducible benchmark report.
+## Phase 2 — Plans, subscriptions, and quota enforcement (P0)
+Define versioned plans, monthly/yearly periods, image/batch/storage/AI limits, subscription lifecycle, usage ledger, atomic reservation/settlement, and failure release. Do not invent prices or limits.
+Exit: tests for UTC period boundaries, cancellation/expired/past-due states, duplicate requests, concurrent quota races, and exhaustion.
 
-## Phase 4 — AI fallback and budgets
-- Define measurable fallback criteria.
-- Add provider adapter, timeouts, bounded retries, and per-batch/global budgets.
-- Mock AI calls in CI.
-- Exit: tests prove fallback only runs when eligible and budget permits.
+## Phase 3 — Automated payments (P0 after Phase 2)
+Compare gateway merchant eligibility, VND/local methods, recurring support, signed webhooks, refunds, fees, sandbox. Record an ADR and obtain owner approval. Implement hosted checkout, verified signature handling, durable idempotent webhook inbox, reconciliation, and sandbox tests.
+Exit: replay-safe verified sandbox matrix. Never activate paid entitlements from a browser redirect alone.
 
-## Phase 5 — Review, normalization, matching
-- Editable structured rows, field-level uncertainty, provenance.
-- Field-aware normalization.
-- Surface duplicate candidates and conflicts for human decisions.
-- Exit: safe non-destructive behavior is tested.
+## Phase 4 — Customer SaaS dashboard
+Signup/onboarding, plan and usage display, batch history, account settings, subscription management, clear quota/error states.
+Exit: end-to-end onboarding and usage tests.
 
-## Phase 6 — Combined exports
-- Export one combined XLSX and CSV per batch.
-- Test Unicode, empty fields, row consistency, and spreadsheet formula injection.
-- Exit: generated files parse and match expected data.
+## Phase 5 — OCR and extraction
+Prepare synthetic/licensed Vietnamese and English fixtures; benchmark PaddleOCR vs Tesseract; publish CER/WER, field accuracy, latency, hardware/environment; implement provider-independent OCR and schema extraction.
+Exit: reproducible measured benchmark and adapter tests.
 
-## Phase 7 — Quality and operations
-- Integration/end-to-end tests and repeatable benchmark.
-- Document backup, restore, migrations, limits, logging, deployment.
-- Add staging deployment and smoke tests without exposing secrets.
-- Exit: release checklist and verified staging evidence.
+## Phase 6 — AI fallback
+Measured eligibility thresholds, provider adapter, timeouts, bounded retries, usage/cost accounting, account/batch/platform budgets; mock paid providers in CI.
+Exit: fallback only when eligible and budget allows.
 
-Dependency order: foundation → persistence → upload → OCR/extraction → AI fallback → review/matching → exports → staging hardening.
-Do not deploy production or enable paid AI by default. A phase is not complete without evidence.
+## Phase 7 — Review and matching
+Editable records, provenance, uncertainty, normalization, duplicate candidates and conflict decisions; no silent merge/delete.
+
+## Phase 8 — Combined exports
+One combined CSV/XLSX per batch, Unicode/empty-cell consistency, formula-injection safety, entitlement checks.
+
+## Phase 9 — Release readiness
+E2E, observability, abuse/rate limits, backup/restore, privacy/retention, staging smoke tests, gateway reconciliation, runbooks and release checklist. No staging before auth/tenant gates; no production deployment without explicit approval.
+
+## Dependency order
+Foundation → identity/tenant security → plans/quotas → gateway/webhooks → SaaS dashboard → OCR → AI fallback → review → export → release readiness.
+
+## Definition of done
+Each phase has migrations where needed, appropriate tests, CI evidence, updated backlog/progress/decision/risk/next-action docs, and explicit gaps. Never merge or deploy without explicit owner instruction.
