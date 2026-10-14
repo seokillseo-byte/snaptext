@@ -15,9 +15,25 @@ concurrency:
 
 jobs:
   verify:
-    name: Install, test, typecheck, build
+    name: Install, migrate, test, typecheck, build
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: snaptext
+          POSTGRES_USER: snaptext
+          POSTGRES_PASSWORD: snaptext
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U snaptext -d snaptext"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://snaptext:snaptext@localhost:5432/snaptext
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,6 +43,8 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
+      - name: Apply database migrations
+        run: npm run db:migrate
       - name: Run API tests
         run: npm test
       - name: Typecheck
