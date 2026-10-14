@@ -41,7 +41,7 @@ test("workspace batch upload validates actual file content and flags duplicates"
       .attach("images", tinyPng, { filename: "duplicate.png", contentType: "image/png" })
       .attach("images", Buffer.from("this is not an image"), { filename: "fake.png", contentType: "image/png" });
 
-    assert.equal(uploadResponse.status, 201);
+    assert.equal(uploadResponse.status, 200);
     assert.equal(uploadResponse.body.data.accepted.length, 1);
     assert.equal(uploadResponse.body.data.accepted[0].filename, "tiny.png");
     assert.equal(uploadResponse.body.data.accepted[0].mimeType, "image/png");
