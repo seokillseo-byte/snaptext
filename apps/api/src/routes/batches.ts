@@ -4,6 +4,7 @@ import path from "node:path";
 import { Router } from "express";
 import multer from "multer";
 import { getPool } from "../db/pool.js";
+import { PostgresBatchRepository } from "../repositories/postgresBatchRepository.js";
 import { BatchService, type UploadedImage } from "../services/batchService.js";
 import { LocalImageStorage } from "../storage/localImageStorage.js";
 
@@ -33,7 +34,7 @@ const storage = new LocalImageStorage();
 export const batchesRouter = Router();
 
 function service(): BatchService {
-  return new BatchService(getPool(), storage);
+  return new BatchService(new PostgresBatchRepository(getPool()), storage);
 }
 
 function routeError(error: unknown, response: import("express").Response): void {
@@ -111,6 +112,7 @@ batchesRouter.post(
         return;
       }
 
+      const repositoryService = service();
       const accepted: Awaited<ReturnType<BatchService["uploadImages"]>>["accepted"] = [];
       const rejected: Awaited<ReturnType<BatchService["uploadImages"]>>["rejected"] = [];
       for (const file of files) {
@@ -120,7 +122,7 @@ batchesRouter.post(
             originalname: file.originalname,
             size: file.size
           };
-          const result = await service().uploadImages(
+          const result = await repositoryService.uploadImages(
             request.params.workspaceId,
             request.params.batchId,
             [image]
