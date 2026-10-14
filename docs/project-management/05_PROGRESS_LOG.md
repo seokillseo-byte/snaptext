@@ -1,22 +1,24 @@
 # SnapText — Progress Log
 
-## 2026-10-14 — Repository foundation and persistence baseline
-- Confirmed repository: seokillseo-byte/snaptext.
-- Initial inspection showed no branches and no prior code files; initialized Git history and created branch foundation/project-bootstrap.
-- Added project charter, master plan, architecture proposal, roadmap, backlog, decision log, risk register, test strategy, and next-action handoff.
-- Added React/Vite web preview and Express API with liveness and database-readiness endpoints.
-- Added API tests and GitHub Actions workflow.
-- Added PostgreSQL driver, checksum-verified SQL migration runner, initial schema, and local PostgreSQL Compose service.
-- Initial schema covers workspaces, extraction schemas, batches, source images, extracted records/fields, duplicate candidates, conflicts, and usage events.
-- Added development instructions and environment example.
-- Upload remains intentionally disabled; OCR, AI fallback, review/edit, duplicate resolution, and combined export are not implemented yet.
+## 2026-10-14 — Foundation, PostgreSQL, and upload workflow
+- Initialized the project in repository seokillseo-byte/snaptext on branch foundation/project-bootstrap.
+- Added project charter, master plan, architecture, roadmap, backlog, decision log, risk register, test strategy, progress log, and next-action handoff.
+- Added React + TypeScript + Vite UI, Express API, health/readiness endpoints, PostgreSQL pool, SQL migration runner with SHA-256 migration checksums, and initial schema.
+- GitHub Actions run 37 passed: PostgreSQL service startup, migration, API tests, typecheck, and production build: https://github.com/seokillseo-byte/snaptext/actions/runs/38539095776
+- Added workspace and batch creation endpoints.
+- Added multi-image upload API with multipart limits, content-signature validation (PNG/JPEG/WEBP/GIF/TIFF/BMP), SHA-256 hashes, private local storage using server-generated filenames, per-image database records, and duplicate-content reporting.
+- Added an integration test covering upload of a PNG, rejection of fake image content, duplicate detection, and persisted image count.
+- Connected the React upload form to create a workspace and batch and display accepted/rejected file outcomes.
+- Added .snaptext-data/ to .gitignore and local API usage documentation.
+- The latest CI runs for upload and UI changes are still in progress at the time of this entry; do not claim them as passed until a completed run confirms success.
 
-## Verification evidence
-- GitHub Actions run 7: install, API tests, typecheck, and build passed for the pre-database-integration baseline: https://github.com/seokillseo-byte/snaptext/actions/runs/38538409210
-- GitHub Actions run 8: install, API tests, typecheck, and build passed for the same baseline commit: https://github.com/seokillseo-byte/snaptext/actions/runs/38538416979
-- PostgreSQL migration integration workflow has been added and is pending verification on the latest commit.
-- Local tests/build were not run in this chat runtime.
-- No production deployment has been attempted.
+## Known gaps and safety limits
+- No authentication or workspace authorization exists yet. Do not expose the service publicly or use sensitive/production data.
+- Multer currently buffers uploaded files in memory. A total request-size limit or streaming/disk-backed multipart implementation is still required before public deployment.
+- The service currently contains SQL operations directly; repository abstraction/persistence tests are a follow-up task.
+- OCR, AI fallback, schema-driven extraction, review/edit, record-level deduplication/conflict resolution, and combined CSV/XLSX export are not implemented.
+- npm lockfile has not been committed; CI currently uses npm install.
+- No local runtime tests were executed in this chat session.
 
 ## Entry format for each task
 - Scope and outcome
