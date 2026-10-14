@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import { getPool } from "./db/pool.js";
+import { batchesRouter } from "./routes/batches.js";
 
 export const app = express();
 
@@ -29,6 +30,8 @@ app.get("/api/health/ready", async (_request, response) => {
     });
   }
 });
+
+app.use("/api", batchesRouter);
 
 app.use((_request, response) => {
   response.status(404).json({
