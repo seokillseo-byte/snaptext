@@ -13,9 +13,12 @@
 - Owner confirmed SnapText is a customer-facing SaaS for selling the service, not an internal tool.
 - Confirmed self-service registration/use, monthly/yearly subscriptions with plan-defined limits, and automated gateway payment.
 - Updated project charter, master plan, architecture, roadmap, backlog, decision log, risk register, quality strategy, and next-action handoff for tenant security, server-side entitlements, webhook safety, and staged delivery.
-- Gateway, email provider, plan prices/limits, grace period, and cancellation/refund policy remain undecided pending evidence and owner approval.
-- PR #1 remains Draft/open. No merge, public exposure, or deployment was performed.
-- Next: implement Phase 1 identity and tenant isolation after inspecting the current code and dependencies; test cross-tenant access comprehensively.
+- Added ADR-001 documenting the identity/session/tenant-isolation direction: docs/project-management/10_ADR_SAAS_IDENTITY.md.
+- Created GitHub Issue #2 to track Phase 1 identity and tenant isolation: https://github.com/seokillseo-byte/snaptext/issues/2.
+- Updated PR #1 description to reflect SaaS scope and security limitations. PR remains Draft/open; no merge or deployment was performed.
+- GitHub Actions run 156 was in progress when last checked: https://github.com/seokillseo-byte/snaptext/actions/runs/38595937562. Do not treat it as passed until the run completes.
+- No auth, billing, gateway integration, OCR, or export implementation was added in this planning/architecture slice.
+- Next: implement Phase 1 identity and tenant isolation, then require cross-tenant tests to pass before public exposure or billing.
 
 ## Entry format for each task
 - Scope and outcome
