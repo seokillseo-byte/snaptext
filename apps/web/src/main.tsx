@@ -56,7 +56,7 @@ function App() {
           combined.push(file);
         }
       }
-      return combined.slice(0, 50);
+      return combined.slice(0, 20);
     });
     setErrorMessage("");
     setResult(null);
@@ -72,6 +72,15 @@ function App() {
   async function uploadBatch(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (files.length === 0 || isUploading) return;
+    if (files.some((file) => file.size > 10 * 1024 * 1024)) {
+      setErrorMessage("Each image must be 10 MB or smaller.");
+      return;
+    }
+    if (totalBytes > 100 * 1024 * 1024) {
+      setErrorMessage("The combined upload must not exceed 100 MB. Remove some images and upload another batch.");
+      return;
+    }
+
     setIsUploading(true);
     setErrorMessage("");
     setStatusMessage("Creating workspace and batch…");
@@ -183,7 +192,7 @@ function App() {
               <FileImage size={23} />
               <strong>Choose images from your computer</strong>
               <span>PNG · JPG · WEBP · GIF · TIFF · BMP</span>
-              <span>Up to 50 files, 15 MB each</span>
+              <span>Up to 20 files, 10 MB each, 100 MB total</span>
             </button>
 
             {files.length > 0 && (
