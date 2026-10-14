@@ -52,6 +52,85 @@ async function cleanupTempFiles(files: Express.Multer.File[]): Promise<void> {
   await Promise.all(files.map((file) => rm(file.path, { force: true }).catch(() => undefined)));
 }
 
+
+function queryInteger(value: unknown, fallback: number, label: string): number {
+  if (value === undefined) return fallback;
+  if (typeof value !== "string" || !/^\\d+$/.test(value)) {
+    throw Object.assign(new Error(`${label} must be a positive integer.`), { statusCode: 400, code: "INVALID_PAGINATION" });
+  }
+  const parsed = Number(value);
+  if (!Number.isSafeInteger(parsed)) {
+    throw Object.assign(new Error(`${label} must be a safe integer.`), { statusCode: 400, code: "INVALID_PAGINATION" });
+  }
+  return parsed;
+}
+
+function readPagination(request: import("express").Request): { page: number; pageSize: number } {
+  return {
+    page: queryInteger(request.query.page, 1, "page"),
+    pageSize: queryInteger(request.query.pageSize, 20, "pageSize")
+  };
+}
+
+batchesRouter.get("/workspaces", async (request, response) => {
+  try {
+    const { page, pageSize } = readPagination(request);
+    response.status(200).json({ data: await service().listWorkspaces(page, pageSize) });
+  } catch (error) {
+    routeError(error, response);
+  }
+});
+
+batchesRouter.get("/workspaces/:workspaceId", async (request, response) => {
+  try {
+    response.status(200).json({ data: await service().getWorkspace(request.params.workspaceId) });
+  } catch (error) {
+    routeError(error, response);
+  }
+});
+
+batchesRouter.get("/workspaces/:workspaceId/batches", async (request, response) => {
+  try {
+    const { page, pageSize } = readPagination(request);
+    response.status(200).json({
+      data: await service().listBatches(request.params.workspaceId, page, pageSize)
+    });
+  } catch (error) {
+    routeError(error, response);
+  }
+});
+
+batchesRouter.get("/workspaces/:workspaceId/batches/:batchId", async (request, response) => {
+  try {
+    response.status(200).json({
+      data: await service().getBatch(request.params.workspaceId, request.params.batchId)
+    });
+  } catch (error) {
+    routeError(error, response);
+  }
+});
+
+batchesRouter.get("/workspaces/:workspaceId/batches/:batchId/images", async (request, response) => {
+  try {
+    const { page, pageSize } = readPagination(request);
+    response.status(200).json({
+      data: await service().listImages(request.params.workspaceId, request.params.batchId, page, pageSize)
+    });
+  } catch (error) {
+    routeError(error, response);
+  }
+});
+
+batchesRouter.get("/workspaces/:workspaceId/batches/:batchId/images/:imageId", async (request, response) => {
+  try {
+    response.status(200).json({
+      data: await service().getImage(request.params.workspaceId, request.params.batchId, request.params.imageId)
+    });
+  } catch (error) {
+    routeError(error, response);
+  }
+});
+
 batchesRouter.post("/workspaces", async (request, response) => {
   try {
     const name = typeof request.body?.name === "string" ? request.body.name : "";
