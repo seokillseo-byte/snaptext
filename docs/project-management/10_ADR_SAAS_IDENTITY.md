@@ -1,0 +1,14 @@
+# ADR-001 — SaaS identity and tenant isolation
+
+- Status: Accepted for implementation direction; library/provider details require dependency review.
+- Date: 2026-10-14
+- Context: SnapText is a customer-facing SaaS with self-service signup and customer-owned workspaces. Existing workspace, batch, and image APIs do not yet authenticate callers. Public exposure would permit cross-customer data access.
+- Decision: Implement authentication and authorization before any staging/public exposure or billing work. Every tenant-owned request must derive the authenticated user from a verified server-side session and verify workspace membership/role before reading or mutating data. Never trust a workspace ID supplied by the client as proof of ownership.
+- Session direction: Prefer opaque, cryptographically random, server-side sessions in PostgreSQL with secure HttpOnly cookies, rotation on login/privilege change, revocation on logout/password reset, expiry, and rate limits. Store only a hash of the session secret server-side. Final cookie SameSite/Secure and CSRF configuration must match the deployment origin model.
+- Passwords/tokens: Use a maintained password-hashing library if already present or add one through the repository's lockfile workflow; do not invent a password hash. One-time verification/reset tokens must be random, stored hashed, single-use, expiring, and never logged. Never return production verification/reset secrets from public endpoints.
+- Email: Keep delivery behind an interface. Registration cannot become production-ready until a real delivery provider and verified-email flow are configured. A test-only mail adapter may be used in automated tests, never as an implicit production fallback.
+- Authorization model: WorkspaceMembership with explicit role; begin with owner/member roles and least privilege. Platform administration is separate from customer workspace roles and must not be inferred from request data.
+- Data model: Add new numbered migrations; never modify an applied migration. Backfill existing development workspaces only through an explicit migration/seed policy. Do not grant all users access to legacy workspaces implicitly.
+- Testing: Prove anonymous denial and cross-tenant read/write denial for workspace, batch, and image endpoints; test expiry/replay, revocation, and regression of upload/read behavior.
+- Consequences: This adds work before OCR but is a release-blocking security boundary. Plan/quota and gateway work must build on the authenticated tenant model.
+- Not decided here: exact auth library, email provider, payment gateway, plan prices/limits, trial/grace rules, and cancellation/refund policy.
