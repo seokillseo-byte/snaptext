@@ -4,7 +4,7 @@ import path from "node:path";
 import { getPool, closePool } from "./pool.js";
 
 async function runMigrations(): Promise<void> {
-  const migrationDirectory = path.resolve(process.cwd(), "db/migrations");
+  const migrationDirectory = path.resolve(process.cwd(), "../../db/migrations");
   const files = (await readdir(migrationDirectory))
     .filter((file) => /^\d+_[a-z0-9_-]+\.sql$/i.test(file))
     .sort();
