@@ -1,16 +1,16 @@
 # SnapText — Next Action
 
 ## Current status
-Repository bootstrap is in progress on branch foundation/project-bootstrap. Project requirements and implementation sequence are documented incrementally. No application behavior is considered complete until code and test evidence exist.
+Foundation code and project documentation are on branch foundation/project-bootstrap. The web preview and API health endpoint are implemented. Automated test/build results are not yet verified.
 
 ## Next concrete action
-Finish foundation by adding a minimal frontend and accessible upload-oriented placeholder UI, API health endpoint, automated test, CI workflow, safe environment example, and local development instructions.
+Open a pull request for foundation/project-bootstrap, inspect GitHub Actions, fix any actual failures, and add a lockfile so dependency installation is reproducible.
 
 ## Definition of done
-- Reproducible package/dependency setup.
-- CI workflow syntax and run status inspected.
-- Local tests/build run when an execution environment is available; evidence recorded accurately.
-- No secrets or private image data committed.
-- Progress log updated with exact verification evidence.
+- PR exists and CI completes.
+- Unit tests, typecheck, and production builds pass with recorded run evidence.
+- npm lockfile is committed and CI uses npm ci.
+- Known gaps remain explicit; no production deployment is claimed.
 
-After this task, update this file with the next single actionable task.
+## After foundation is verified
+Implement Phase 1 persistence: PostgreSQL schema/migrations and repository/service contracts for batches, source images, schemas, records, field values, provenance, conflicts, and usage.
