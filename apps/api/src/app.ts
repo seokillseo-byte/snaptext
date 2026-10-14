@@ -1,6 +1,7 @@
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
+import { getPool } from "./db/pool.js";
 
 export const app = express();
 
@@ -15,6 +16,18 @@ app.get("/api/health", (_request, response) => {
     service: "snaptext-api",
     timestamp: new Date().toISOString()
   });
+});
+
+app.get("/api/health/ready", async (_request, response) => {
+  try {
+    await getPool().query("SELECT 1");
+    response.status(200).json({ status: "ready", database: "ok" });
+  } catch {
+    response.status(503).json({
+      status: "not_ready",
+      database: "unavailable"
+    });
+  }
 });
 
 app.use((_request, response) => {
