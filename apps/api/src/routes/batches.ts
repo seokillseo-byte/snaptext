@@ -55,7 +55,7 @@ async function cleanupTempFiles(files: Express.Multer.File[]): Promise<void> {
 
 function queryInteger(value: unknown, fallback: number, label: string): number {
   if (value === undefined) return fallback;
-  if (typeof value !== "string" || !/^\\d+$/.test(value)) {
+  if (typeof value !== "string" || !/^\d+$/.test(value)) {
     throw Object.assign(new Error(`${label} must be a positive integer.`), { statusCode: 400, code: "INVALID_PAGINATION" });
   }
   const parsed = Number(value);
