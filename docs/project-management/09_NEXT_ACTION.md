@@ -1,11 +1,11 @@
 # SnapText — Next Action
 
 ## Current status
-The foundation, PostgreSQL schema/migration, workspace and batch creation, multi-image upload, server-side image signature validation, SHA-256 duplicate detection, private permanent storage, disk-backed multipart staging, upload UI, PostgreSQL repository contract, total request-size limit, and temporary-file cleanup tests are implemented on foundation/project-bootstrap. GitHub Actions run 93 passed migration twice, API tests, TypeScript checks, and production build.
+The foundation, PostgreSQL schema/migration, workspace and batch creation, multi-image upload, server-side image signature validation, SHA-256 duplicate detection, private permanent storage, disk-backed multipart staging, upload UI, and paginated workspace/batch/image read APIs are implemented on `foundation/project-bootstrap`. Integration coverage now exercises persisted pagination, details, parent scoping, invalid pagination, and storage-key privacy. The latest successful validation before these read APIs was GitHub Actions run 94; the read API changes still require a fresh CI result.
 
 ## Immediate next action
-1. Commit an npm lockfile and switch CI from npm install to npm ci.
-2. Add workspace, batch, and image list/detail endpoints with pagination and persistence tests.
+1. Obtain a genuine npm-generated `package-lock.json` and switch CI from `npm install` to `npm ci`. Do not hand-author or fabricate dependency resolutions.
+2. Run the full GitHub Actions workflow on the current branch and fix any failures.
 3. Add authentication and workspace authorization before any staging/public exposure.
 4. Prepare synthetic/licensed Vietnamese and English sample images and benchmark PaddleOCR versus Tesseract before choosing the OCR engine.
 
