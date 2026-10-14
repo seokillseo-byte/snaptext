@@ -22,12 +22,12 @@
 - List endpoints support bounded `page` and `pageSize` pagination and return total/totalPages metadata. IDs and parent-child scope are checked; storage keys are not returned by read APIs.
 - Added PostgreSQL integration coverage for persisted pagination, detail retrieval, workspace/batch scope, invalid pagination, and storage-key privacy.
 - Validation status: changes were authored directly on GitHub; a fresh GitHub Actions result is still pending. No local runtime tests were run in this session.
-- npm lockfile remains pending. The execution environment could not reach GitHub to clone the repository and generate a genuine npm lockfile locally; dependency resolutions will not be fabricated.
+- Generated a genuine npm lockfile through npm install on GitHub Actions and committed it to the branch. CI now uses npm ci and npm's cache support; the final workflow run is pending.
 
 ## Known gaps and safety limits
 - No authentication or workspace authorization exists yet. Do not expose the service publicly or upload sensitive/production data.
 - Combined request-size validation occurs after multipart files have been staged to private temporary disk storage. Per-file and file-count caps bound staging usage, but production deployment still needs operational disk monitoring and rate limiting.
-- npm lockfile has not been committed; CI currently uses npm install.
+- A genuine npm-generated package-lock.json is committed; CI now uses npm ci.
 - OCR, AI fallback, schema-driven extraction, review/edit, record-level duplicate/conflict resolution, and combined CSV/XLSX export are not implemented.
 - No local runtime tests were executed in this chat session; validation evidence comes from GitHub Actions.
 
