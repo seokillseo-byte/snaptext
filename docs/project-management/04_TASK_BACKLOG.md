@@ -1,20 +1,24 @@
 # SnapText — Task Backlog
 
 ## P0 Foundation
-- [ ] Verify repository settings/default branch.
-- [ ] Add project documentation and decision log.
-- [ ] Add CI for install, lint/typecheck, tests, and build.
-- [ ] Add minimal frontend and API health endpoint.
-- [ ] Add automated tests for the health endpoint.
-- [ ] Add environment example and ignore secrets.
-- [ ] Document local development.
+- [x] Verify repository settings/default branch.
+- [x] Add project documentation and decision log.
+- [x] Add CI for install, tests, typecheck, and build.
+- [x] Add minimal frontend and API health endpoint.
+- [x] Add automated tests for API health.
+- [x] Add environment example and ignore secrets.
+- [x] Document local development.
+- [ ] Commit npm lockfile and switch CI to npm ci.
 
 ## P1 Persistence and upload
-- [ ] Select database library and migration strategy.
-- [ ] Add migrations for batches, images, schemas, records, fields, provenance, conflicts, and usage.
+- [x] Add initial PostgreSQL schema for workspaces, schemas, batches, images, records, fields, duplicate candidates, conflicts, and usage events.
+- [x] Add checksum-verified SQL migration runner.
+- [x] Add database connection pool and readiness endpoint.
+- [ ] Verify migrations against PostgreSQL in GitHub Actions.
+- [ ] Add repository/service contracts and persistence tests.
 - [ ] Implement upload validation and private storage adapter.
-- [ ] Add batch/image status endpoints.
-- [ ] Test limits, invalid MIME types, checksums, and partial failure.
+- [ ] Add batch/image upload and status endpoints.
+- [ ] Test file limits, actual MIME types, checksums, and partial failure.
 
 ## P2 OCR and extraction
 - [ ] Prepare synthetic/licensed benchmark images.
