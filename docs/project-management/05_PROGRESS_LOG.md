@@ -7,14 +7,13 @@
 - GitHub Actions run 37 passed: PostgreSQL startup, migration, API tests, typecheck, and build: https://github.com/seokillseo-byte/snaptext/actions/runs/38539095776
 - Added workspace and batch creation endpoints.
 - Added multi-image upload API with server-side image signature validation (PNG/JPEG/WEBP/GIF/TIFF/BMP), SHA-256, private storage using server-generated names, per-image records, and exact-content duplicate reporting.
-- Multipart files use private temporary disk storage; configurable limits cover file count, per-file size, and combined request size. Temporary files are removed after processing.
+- Multipart files use private temporary disk storage; configurable limits cover file count, per-file size, and combined request size. Temporary files are removed before the upload response is returned.
 - Added BatchRepository contract and PostgreSQL implementation; service-layer SQL was moved into the repository.
-- Added integration coverage for a valid PNG, fake image content, duplicate content, and persisted batch image count.
 - Connected the React upload form to workspace/batch creation and multi-image upload; the UI displays accepted and rejected outcomes.
 - GitHub Actions run 79 passed migration, API tests, typecheck, and build for the upload/repository implementation: https://github.com/seokillseo-byte/snaptext/actions/runs/38584564365
-- A workflow revision initially failed before job startup because runner.temp was referenced in job-level environment variables. The workflow was corrected to use configured private relative paths.
 - GitHub Actions run 84 passed both migration executions (idempotence check), API tests, TypeScript checks, and production build: https://github.com/seokillseo-byte/snaptext/actions/runs/38585487150
-- Added a new integration test that forces the combined upload-size limit and asserts that temporary files are cleaned and no image rows are persisted. CI verification for this latest test is pending.
+- Added an integration test forcing the combined request-size limit and verifying that no image rows persist and temporary files are removed. The first run exposed a response/cleanup race; the route was corrected to await cleanup before returning the 413 response.
+- Latest validation run 93 passed migrations twice, all API tests (including upload limit and cleanup), typecheck, and production build: https://github.com/seokillseo-byte/snaptext/actions/runs/38586320140
 
 ## Known gaps and safety limits
 - No authentication or workspace authorization exists yet. Do not expose the service publicly or upload sensitive/production data.
