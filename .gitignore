@@ -9,5 +9,6 @@ coverage/
 Thumbs.db
 uploads/
 storage/
+.snaptext-data/
 tmp/
 .cache/
