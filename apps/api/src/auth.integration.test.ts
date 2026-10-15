@@ -45,9 +45,11 @@ test("self-service registration requires verification and supports session login
       .post("/api/auth/login")
       .send({ email, password: "long-test-password-123" });
     assert.equal(login.status, 200);
-    const setCookie = login.headers["set-cookie"] as string[];
-    assert.ok(setCookie?.[0]?.startsWith("snaptext_session="));
-    const cookie = setCookie[0].split(";")[0];
+    const setCookieHeader = login.headers["set-cookie"];
+    assert.ok(setCookieHeader);
+    const setCookie = Array.isArray(setCookieHeader) ? setCookieHeader[0] : setCookieHeader;
+    assert.ok(setCookie.startsWith("snaptext_session="));
+    const cookie = setCookie.split(";")[0];
 
     const me = await request(app).get("/api/auth/me").set("Cookie", cookie);
     assert.equal(me.status, 200);
@@ -80,7 +82,10 @@ test("self-service registration requires verification and supports session login
     const newPasswordLogin = await request(app).post("/api/auth/login")
       .send({ email, password: "new-long-test-password-456" });
     assert.equal(newPasswordLogin.status, 200);
-    const newCookie = (newPasswordLogin.headers["set-cookie"] as string[])[0].split(";")[0];
+    const newSetCookieHeader = newPasswordLogin.headers["set-cookie"];
+    assert.ok(newSetCookieHeader);
+    const newSetCookie = Array.isArray(newSetCookieHeader) ? newSetCookieHeader[0] : newSetCookieHeader;
+    const newCookie = newSetCookie.split(";")[0];
     const currentUser = await request(app).get("/api/auth/me").set("Cookie", newCookie);
     assert.equal(currentUser.status, 200);
   } finally {
