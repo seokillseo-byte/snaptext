@@ -26,7 +26,9 @@
 - Protected workspace/batch/image APIs with authentication and workspace membership checks. Workspace creation now grants the creator OWNER membership; workspace listing is scoped to the authenticated user.
 - Added customer login/register/verification UI and authenticated integration-test fixtures; added registration/session/tenant-isolation integration tests.
 - Email delivery is deliberately fail-closed and provider-neutral. No real email provider is configured; signup cannot complete until the owner selects/configures one. Subscription/quota/payment work is not part of this phase.
-- CI run 200 is pending at the time of this log update: https://github.com/seokillseo-byte/snaptext/actions/runs/38723190540. Do not treat it as passed until it completes.
+- The first Phase 1 CI run exposed two fixture issues (recursive Supertest wrapper and an invalid expired-session fixture); both were corrected.
+- GitHub Actions run 224 passed migration, API tests, typecheck, and build for the backend/auth implementation: https://github.com/seokillseo-byte/snaptext/actions/runs/38723754583.
+- GitHub Actions run 225 passed migration, API tests, typecheck, and build including the customer password-reset UI: https://github.com/seokillseo-byte/snaptext/actions/runs/38723891469.
 - No local tests were run. No merge or deployment was performed.
 
 ## Entry format for each task
