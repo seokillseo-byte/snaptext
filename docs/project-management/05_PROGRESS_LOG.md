@@ -49,3 +49,13 @@
 - PR #1 remains Draft/open. No merge or deployment was performed.
 
 - CI run 248 exposed a fixture issue: the migration requires token expiry to occur after token creation, so expired fixtures must backdate `created_at`. Updated both expired-token inserts to satisfy the database constraint; run 249 for commit 5cbef8406abc1fa1402b0aa7300c29b9fc3d563d is pending.
+
+
+## 2026-10-15 — Resend transactional email adapter
+- Owner approved Resend for verification and password-reset email.
+- Implemented `ResendEmailSender` behind the existing `EmailSender` interface using Resend's HTTPS email endpoint and environment-only configuration: `RESEND_API_KEY`, `RESEND_FROM_EMAIL`. Used the native Node.js fetch API to avoid adding a runtime dependency or modifying the lockfile.
+- Adapter maps provider/network/invalid-response failures to a generic error and does not include provider response bodies, API credentials, or raw network error details in thrown messages.
+- Added unit tests for endpoint, bearer authorization, message payload, timeout signal, provider failure secrecy, network failure secrecy, and blank configuration rejection. Updated API test script so service-level tests run in CI.
+- Updated `.env.example`, README, local development guide, backlog, and next-action handoff. No real API key was added to source control.
+- CI has not yet been verified for these latest changes; no local test run was performed. Live email delivery still requires the owner to configure secrets in the runtime environment and use a sender address from a verified Resend domain.
+- PR #1 remains Draft/open. No merge or deployment was performed.
