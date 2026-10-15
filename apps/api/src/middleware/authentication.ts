@@ -1,0 +1,94 @@
+import { createHash } from "node:crypto";
+import type { NextFunction, Request, Response } from "express";
+import { getPool } from "../db/pool.js";
+
+declare global {
+  namespace Express {
+    interface Request {
+      authUser?: { id: string; email: string };
+      authSessionId?: string;
+    }
+  }
+}
+
+function hashToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
+}
+
+function cookieValue(header: string | undefined, name: string): string | undefined {
+  if (!header) return undefined;
+  for (const part of header.split(";")) {
+    const separator = part.indexOf("=");
+    if (separator < 0) continue;
+    if (part.slice(0, separator).trim() === name) return decodeURIComponent(part.slice(separator + 1).trim());
+  }
+  return undefined;
+}
+
+export async function requireAuthentication(request: Request, response: Response, next: NextFunction): Promise<void> {
+  const token = cookieValue(request.headers.cookie, "snaptext_session");
+  if (!token || token.length > 200) {
+    response.status(401).json({ error: { code: "AUTHENTICATION_REQUIRED", message: "Please sign in to continue." } });
+    return;
+  }
+  try {
+    const result = await getPool().query<{ session_id: string; id: string; email: string }>(
+      `SELECT s.id AS session_id, u.id, u.email
+       FROM auth_sessions s INNER JOIN users u ON u.id = s.user_id
+       WHERE s.token_hash = $1 AND s.revoked_at IS NULL AND s.expires_at > now()
+         AND u.email_verified_at IS NOT NULL`,
+      [hashToken(token)]
+    );
+    if (result.rowCount !== 1) {
+      response.status(401).json({ error: { code: "AUTHENTICATION_REQUIRED", message: "Please sign in to continue." } });
+      return;
+    }
+    request.authUser = { id: result.rows[0].id, email: result.rows[0].email };
+    request.authSessionId = result.rows[0].session_id;
+    void getPool().query("UPDATE auth_sessions SET last_seen_at = now() WHERE id = $1", [result.rows[0].session_id]).catch(() => undefined);
+    next();
+  } catch {
+    response.status(503).json({ error: { code: "AUTHENTICATION_UNAVAILABLE", message: "Authentication is temporarily unavailable." } });
+  }
+}
+
+export function requireSameOrigin(request: Request, response: Response, next: NextFunction): void {
+  if (["GET", "HEAD", "OPTIONS"].includes(request.method)) {
+    next();
+    return;
+  }
+  const origin = request.get("origin");
+  if (!origin) {
+    next();
+    return;
+  }
+  const host = request.get("host");
+  const expected = host ? `${request.protocol}://${host}` : "";
+  if (!expected || origin !== expected) {
+    response.status(403).json({ error: { code: "CROSS_ORIGIN_REQUEST", message: "Cross-origin state changes are not allowed." } });
+    return;
+  }
+  next();
+}
+
+export async function requireWorkspaceMembership(request: Request, response: Response, next: NextFunction): Promise<void> {
+  const workspaceId = request.params.workspaceId;
+  const userId = request.authUser?.id;
+  if (!workspaceId || !userId) {
+    response.status(401).json({ error: { code: "AUTHENTICATION_REQUIRED", message: "Please sign in to continue." } });
+    return;
+  }
+  try {
+    const result = await getPool().query(
+      "SELECT 1 FROM workspace_memberships WHERE workspace_id = $1 AND user_id = $2",
+      [workspaceId, userId]
+    );
+    if (result.rowCount !== 1) {
+      response.status(404).json({ error: { code: "WORKSPACE_NOT_FOUND", message: "Workspace was not found." } });
+      return;
+    }
+    next();
+  } catch {
+    response.status(503).json({ error: { code: "AUTHORIZATION_UNAVAILABLE", message: "Authorization is temporarily unavailable." } });
+  }
+}
