@@ -14,29 +14,20 @@
 6. Open the Vite URL shown in the terminal (normally http://localhost:5173).
 7. Check API liveness at http://localhost:3001/api/health and database readiness at http://localhost:3001/api/health/ready.
 
-## Initial API flow
-Create a workspace:
-```bash
-curl -X POST http://localhost:3001/api/workspaces \
-  -H "Content-Type: application/json" \
-  -d '{"name":"My workspace"}'
-```
+## Authentication and API access
 
-Use the returned workspace ID to create a batch:
-```bash
-curl -X POST http://localhost:3001/api/workspaces/WORKSPACE_ID/batches \
-  -H "Content-Type: application/json" \
-  -d '{"name":"October import"}'
-```
+Workspace, batch, and image endpoints require a verified account and a valid session cookie. Registration and password reset send one-time emails through the `EmailSender` interface. No delivery provider is selected or configured in this repository, so signup is expected to fail closed until the owner approves a provider and the deployment configures its credentials. Do not bypass this gate or place provider secrets in source control.
 
-Upload one or more image files to the returned batch ID. The multipart field name is `images`:
-```bash
-curl -X POST http://localhost:3001/api/workspaces/WORKSPACE_ID/batches/BATCH_ID/images \
-  -F "images=@./sample.png" \
-  -F "images=@./sample-2.jpg"
-```
+The web development server proxies `/api` to the API, preserving same-origin browser requests. For a deployment, serve the web app and API under the same origin through a trusted reverse proxy where possible. Set `TRUST_PROXY_HOPS` to the exact number of trusted proxy hops only when deployed behind a proxy; do not set it blindly. The session cookie is HttpOnly and SameSite=Lax, and is marked Secure when `NODE_ENV=production`.
 
-The upload endpoint verifies file signatures rather than trusting the supplied filename or browser MIME type. It accepts PNG, JPEG, WEBP, GIF, TIFF, and BMP. Defaults are up to 20 files per request, 10 MB per file, and 100 MB combined request size; these can be configured using `UPLOAD_MAX_FILES`, `UPLOAD_MAX_FILE_SIZE_MB`, and `UPLOAD_MAX_TOTAL_SIZE_MB`. Multipart data is staged in private temporary disk storage (`UPLOAD_TEMP_ROOT`) and then moved to private permanent local storage (`STORAGE_ROOT`) using server-generated filenames. Keep both paths outside any public web root. Exact-content duplicates within one batch and unsupported files are returned in the `rejected` array rather than silently merged.
+After a real email sender is configured, the expected flow is:
+1. Register an account in the web UI.
+2. Open the verification email and enter the one-time verification token.
+3. Sign in; the API sets the session cookie.
+4. Create a workspace and batches through the authenticated UI/API.
+5. Use password reset only through the one-time email token flow.
+
+The API returns generic password-reset request responses to reduce account enumeration. Verification and reset tokens are single-use and expire. Never log or share tokens, cookies, or customer data.
 
 ## Checks
 - `npm test` — API unit and integration tests.
@@ -45,4 +36,4 @@ The upload endpoint verifies file signatures rather than trusting the supplied f
 - `npm run db:migrate` — apply pending SQL migrations; applied migration checksums are verified.
 
 ## Current limitations
-There is not yet user authentication or workspace authorization; do not expose this preview publicly or upload sensitive/production data. OCR, AI fallback, schema-driven extraction, review/edit, duplicate-record comparison, conflict resolution, and combined CSV/XLSX export are not implemented. Use synthetic/test images during development.
+Authentication and workspace authorization are implemented but Phase 1 is not release-ready: the email provider is unselected, auth throttling is process-local, and security review/CI validation for the latest expiry tests must be completed. Do not expose this preview publicly or upload sensitive/production data. OCR, AI fallback, schema-driven extraction, review/edit, duplicate-record comparison, conflict resolution, and combined CSV/XLSX export are not implemented. Use synthetic/test images during development.
