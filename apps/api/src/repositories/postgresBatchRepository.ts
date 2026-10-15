@@ -58,12 +58,26 @@ function toImage(row: {
 export class PostgresBatchRepository implements BatchRepository {
   constructor(private readonly pool: Pool) {}
 
-  async createWorkspace(name: string): Promise<WorkspaceRecord> {
-    const result = await this.pool.query<{ id: string; name: string; created_at: Date }>(
-      "INSERT INTO workspaces (name) VALUES ($1) RETURNING id, name, created_at",
-      [name]
-    );
-    return toWorkspace(result.rows[0]);
+  async createWorkspace(name: string, ownerUserId: string): Promise<WorkspaceRecord> {
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN");
+      const result = await client.query<{ id: string; name: string; created_at: Date }>(
+        "INSERT INTO workspaces (name) VALUES ($1) RETURNING id, name, created_at",
+        [name]
+      );
+      await client.query(
+        "INSERT INTO workspace_memberships (workspace_id, user_id, role) VALUES ($1, $2, 'OWNER')",
+        [result.rows[0].id, ownerUserId]
+      );
+      await client.query("COMMIT");
+      return toWorkspace(result.rows[0]);
+    } catch (error) {
+      await client.query("ROLLBACK").catch(() => undefined);
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   async getWorkspace(workspaceId: string): Promise<WorkspaceRecord | null> {
@@ -74,13 +88,19 @@ export class PostgresBatchRepository implements BatchRepository {
     return result.rowCount ? toWorkspace(result.rows[0]) : null;
   }
 
-  async listWorkspaces(limit: number, offset: number): Promise<PageResult<WorkspaceRecord>> {
+  async listWorkspaces(userId: string, limit: number, offset: number): Promise<PageResult<WorkspaceRecord>> {
     const [rows, count] = await Promise.all([
       this.pool.query<{ id: string; name: string; created_at: Date }>(
-        "SELECT id, name, created_at FROM workspaces ORDER BY created_at DESC, id DESC LIMIT $1 OFFSET $2",
-        [limit, offset]
+        `SELECT w.id, w.name, w.created_at
+         FROM workspaces w INNER JOIN workspace_memberships m ON m.workspace_id = w.id
+         WHERE m.user_id = $1
+         ORDER BY w.created_at DESC, w.id DESC LIMIT $2 OFFSET $3`,
+        [userId, limit, offset]
       ),
-      this.pool.query<{ count: string }>("SELECT count(*) FROM workspaces")
+      this.pool.query<{ count: string }>(
+        "SELECT count(*) FROM workspace_memberships WHERE user_id = $1",
+        [userId]
+      )
     ]);
     return { items: rows.rows.map(toWorkspace), total: Number(count.rows[0].count) };
   }
