@@ -43,3 +43,16 @@ test("unknown API routes return a stable JSON error", async () => {
   assert.equal(response.status, 404);
   assert.equal(response.body.error.code, "NOT_FOUND");
 });
+
+
+test("tenant-owned API rejects anonymous requests", async () => {
+  const response = await request(app).get("/api/workspaces");
+  assert.equal(response.status, 401);
+  assert.equal(response.body.error.code, "AUTHENTICATION_REQUIRED");
+});
+
+test("unknown API routes retain the not-found contract", async () => {
+  const response = await request(app).get("/api/does-not-exist");
+  assert.equal(response.status, 404);
+  assert.equal(response.body.error.code, "NOT_FOUND");
+});
