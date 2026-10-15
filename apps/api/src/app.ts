@@ -2,14 +2,27 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import { getPool } from "./db/pool.js";
+import { requireAuthentication, requireSameOrigin } from "./middleware/authentication.js";
+import { authRouter } from "./routes/auth.js";
 import { batchesRouter } from "./routes/batches.js";
 
 export const app = express();
 
 app.disable("x-powered-by");
 app.use(helmet());
-app.use(cors({ origin: process.env.CORS_ORIGIN?.split(",") ?? true }));
+const allowedOrigins = new Set((process.env.CORS_ORIGIN ?? "").split(",").map((value) => value.trim()).filter(Boolean));
+app.use(cors({
+  credentials: true,
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.has(origin)) {
+      callback(null, true);
+      return;
+    }
+    callback(null, false);
+  }
+}));
 app.use(express.json({ limit: "1mb" }));
+app.use("/api", requireSameOrigin);
 
 app.get("/api/health", (_request, response) => {
   response.status(200).json({
@@ -31,7 +44,8 @@ app.get("/api/health/ready", async (_request, response) => {
   }
 });
 
-app.use("/api", batchesRouter);
+app.use("/api/auth", authRouter);
+app.use("/api", requireAuthentication, batchesRouter);
 
 app.use((_request, response) => {
   response.status(404).json({
