@@ -20,10 +20,14 @@
 - [x] Add integration tests for password-reset replay, session expiry, registration/verification, login/logout, and cross-tenant workspace access.
 - [x] Add integration tests proving expired password-reset and email-verification tokens are rejected; review audit/error behavior further before release.
 - [x] Update README, progress log, next-action handoff, and PR description.
-- [ ] Verify the latest GitHub Actions run for the expiry-test commit and fix any failures.
+- [ ] Verify the latest GitHub Actions run for Resend integration and expiry-test changes; fix any failures.
 
-## Phase 1 blocker
-- [ ] Select, implement, and configure a real email delivery provider behind EmailSender; registration currently fails closed and reset delivery is disabled without a provider.
+## Phase 1 email delivery status
+- [x] Implement Resend HTTPS email adapter behind EmailSender using `RESEND_API_KEY` and `RESEND_FROM_EMAIL`; no API key is stored in the repository.
+- [x] Add adapter tests for request payload/auth header, provider failures, network failures, and secret-safe errors; include service tests in the CI test command.
+- [x] Document environment configuration and verified-sender requirement.
+- [ ] Configure secrets in the deployment environment and verify live email delivery for both registration and password reset.
+- [ ] Complete auth security review and confirm passing CI before Phase 1 release readiness.
 
 ## P0 — Phase 2: Subscription and quotas
 - [ ] Define configurable plan/limit fields without inventing prices or customer-facing quota values.
