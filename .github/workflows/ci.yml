@@ -1,0 +1,59 @@
+name: SnapText CI
+
+on:
+  push:
+    branches: [main, "foundation/**", "feature/**", "fix/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: snaptext-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Install, migrate, test, typecheck, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: snaptext
+          POSTGRES_USER: snaptext
+          POSTGRES_PASSWORD: snaptext
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U snaptext -d snaptext"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://snaptext:snaptext@localhost:5432/snaptext
+      STORAGE_ROOT: .snaptext-data/images
+      UPLOAD_TEMP_ROOT: .snaptext-data/tmp
+      UPLOAD_MAX_FILES: 20
+      UPLOAD_MAX_FILE_SIZE_MB: 10
+      UPLOAD_MAX_TOTAL_SIZE_MB: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Apply database migrations
+        run: npm run db:migrate && npm run db:migrate
+      - name: Run API tests
+        run: npm test
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Build
+        run: npm run build
