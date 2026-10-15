@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "test": "tsx --test src/*.test.ts src/services/*.test.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "db:migrate": "tsx src/db/migrate.ts"
+    "db:migrate": "tsx src/db/migrate.ts",
+    "email:smoke": "tsx src/scripts/resend-smoke-test.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",
