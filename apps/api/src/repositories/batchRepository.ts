@@ -49,9 +49,9 @@ export interface PageResult<T> {
 }
 
 export interface BatchRepository {
-  createWorkspace(name: string): Promise<WorkspaceRecord>;
+  createWorkspace(name: string, ownerUserId: string): Promise<WorkspaceRecord>;
   getWorkspace(workspaceId: string): Promise<WorkspaceRecord | null>;
-  listWorkspaces(limit: number, offset: number): Promise<PageResult<WorkspaceRecord>>;
+  listWorkspaces(userId: string, limit: number, offset: number): Promise<PageResult<WorkspaceRecord>>;
   createBatch(workspaceId: string, name: string): Promise<BatchRecord>;
   getBatch(workspaceId: string, batchId: string): Promise<BatchRecord | null>;
   listBatches(workspaceId: string, limit: number, offset: number): Promise<PageResult<BatchRecord>>;
