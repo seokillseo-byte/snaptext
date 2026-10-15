@@ -83,8 +83,8 @@ test("combined upload limit returns 413 and removes temporary files", {
   const pool = getPool();
   const testSession = await createTestSession(pool);
   const api = {
-    get: (url: string) => api.get(url).set("Cookie", testSession.cookie),
-    post: (url: string) => api.post(url).set("Cookie", testSession.cookie)
+    get: (url: string) => request(app).get(url).set("Cookie", testSession.cookie),
+    post: (url: string) => request(app).post(url).set("Cookie", testSession.cookie)
   };
   const tempRoot = path.resolve(process.env.UPLOAD_TEMP_ROOT ?? path.resolve(process.cwd(), ".snaptext-data/tmp"));
   let workspaceId: string | undefined;
