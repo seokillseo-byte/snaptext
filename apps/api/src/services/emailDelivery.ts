@@ -24,9 +24,11 @@ export function getEmailSender(): EmailSender {
 }
 
 /** Test seam; production code must configure a real sender adapter before registration/reset is enabled. */
-export function setEmailSenderForTests(next: EmailSender): void {
+export function setEmailSenderForTests(next: EmailSender): () => void {
   if (process.env.NODE_ENV === "production") {
     throw new Error("Test email sender cannot be configured in production.");
   }
+  const previous = sender;
   sender = next;
+  return () => { sender = previous; };
 }
