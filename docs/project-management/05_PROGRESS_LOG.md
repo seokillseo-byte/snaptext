@@ -20,6 +20,15 @@
 - No auth, billing, gateway integration, OCR, or export implementation was added in this planning/architecture slice.
 - Next: implement Phase 1 identity and tenant isolation, then require cross-tenant tests to pass before public exposure or billing.
 
+## 2026-10-15 — Phase 1 identity and tenant isolation implementation started
+- Added migration 002 for users, workspace memberships, server-side sessions, one-time verification/reset tokens, and authentication audit events.
+- Added password hashing with Node.js scrypt, hashed session/token storage, self-service register/verify/login/logout/password-reset endpoints, cookie sessions, same-origin checks, and basic per-IP/per-route in-memory auth throttling.
+- Protected workspace/batch/image APIs with authentication and workspace membership checks. Workspace creation now grants the creator OWNER membership; workspace listing is scoped to the authenticated user.
+- Added customer login/register/verification UI and authenticated integration-test fixtures; added registration/session/tenant-isolation integration tests.
+- Email delivery is deliberately fail-closed and provider-neutral. No real email provider is configured; signup cannot complete until the owner selects/configures one. Subscription/quota/payment work is not part of this phase.
+- CI run 200 is pending at the time of this log update: https://github.com/seokillseo-byte/snaptext/actions/runs/38723190540. Do not treat it as passed until it completes.
+- No local tests were run. No merge or deployment was performed.
+
 ## Entry format for each task
 - Scope and outcome
 - Files changed
