@@ -46,7 +46,7 @@ Project charter, master plan, architecture, roadmap, backlog, progress, decision
 
 ## Security and limitations
 
-- Authentication and workspace membership enforcement are implemented in the current branch but still require the current GitHub Actions run to pass and a full security review before public exposure. Email delivery is not configured, so self-service signup cannot complete until an email provider adapter is configured.
+- Authentication and workspace membership enforcement are implemented in the current branch but still require the current GitHub Actions run to pass and a full security review before public exposure. No real email delivery provider adapter is implemented or configured yet, so self-service signup cannot complete until one is selected, implemented, and configured.
 - Subscription plans, quota enforcement, and payment gateway integration are not implemented. Do not expose this development preview publicly or upload sensitive/production data.
 - Keep `STORAGE_ROOT` and `UPLOAD_TEMP_ROOT` outside any public web root.
 - Never commit API keys, passwords, production data, or private images.
