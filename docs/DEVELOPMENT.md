@@ -16,11 +16,11 @@
 
 ## Authentication and API access
 
-Workspace, batch, and image endpoints require a verified account and a valid session cookie. Registration and password reset send one-time emails through the `EmailSender` interface. No delivery provider is selected or configured in this repository, so signup is expected to fail closed until the owner approves a provider and the deployment configures its credentials. Do not bypass this gate or place provider secrets in source control.
+Workspace, batch, and image endpoints require a verified account and a valid session cookie. Registration and password reset send one-time emails through the `EmailSender` interface backed by the Resend HTTPS API. Configure `RESEND_API_KEY` and `RESEND_FROM_EMAIL` in the API process environment. If either value is missing, delivery deliberately fails closed. Use a sender address on a domain verified in Resend; never place a real API key in source control.
 
 The web development server proxies `/api` to the API, preserving same-origin browser requests. For a deployment, serve the web app and API under the same origin through a trusted reverse proxy where possible. Set `TRUST_PROXY_HOPS` to the exact number of trusted proxy hops only when deployed behind a proxy; do not set it blindly. The session cookie is HttpOnly and SameSite=Lax, and is marked Secure when `NODE_ENV=production`.
 
-After a real email sender is configured, the expected flow is:
+After Resend credentials and a verified sender address are configured, the expected flow is:
 1. Register an account in the web UI.
 2. Open the verification email and enter the one-time verification token.
 3. Sign in; the API sets the session cookie.
@@ -36,4 +36,4 @@ The API returns generic password-reset request responses to reduce account enume
 - `npm run db:migrate` — apply pending SQL migrations; applied migration checksums are verified.
 
 ## Current limitations
-Authentication and workspace authorization are implemented but Phase 1 is not release-ready: the email provider is unselected, auth throttling is process-local, and security review/CI validation for the latest expiry tests must be completed. Do not expose this preview publicly or upload sensitive/production data. OCR, AI fallback, schema-driven extraction, review/edit, duplicate-record comparison, conflict resolution, and combined CSV/XLSX export are not implemented. Use synthetic/test images during development.
+Authentication and workspace authorization are implemented but Phase 1 is not release-ready until CI passes, Resend credentials and a verified sender address are configured and live delivery is verified. Auth throttling is process-local and security review is still required. Do not expose this preview publicly or upload sensitive/production data. OCR, AI fallback, schema-driven extraction, review/edit, duplicate-record comparison, conflict resolution, and combined CSV/XLSX export are not implemented. Use synthetic/test images during development.
