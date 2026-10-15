@@ -15,7 +15,7 @@ Implemented and validated in GitHub Actions:
 - Configurable file count, per-file size, and combined request-size limits.
 - Integration tests for valid image upload, fake image rejection, duplicate detection, request-size rejection, and temporary-file cleanup.
 
-Customer authentication screens and API are implemented on the current Draft PR: registration, email verification, login/logout, password reset, server-side sessions, and workspace membership enforcement. Session and one-time tokens are stored as hashes; expired and replayed tokens are rejected. Email delivery still uses a fail-closed adapter because no provider has been selected/configured, so self-service signup and password-reset delivery are not operational. The latest expiry-test commit is awaiting GitHub Actions validation. OCR and extraction have not been implemented yet.
+Customer authentication screens and API are implemented on the current Draft PR: registration, email verification, login/logout, password reset, server-side sessions, and workspace membership enforcement. Session and one-time tokens are stored as hashes; expired and replayed tokens are rejected. Email delivery now has a Resend HTTPS API adapter for verification and password-reset messages. Configure `RESEND_API_KEY` and `RESEND_FROM_EMAIL` in the API environment and verify the sender domain in Resend before live use; without both values, delivery remains fail-closed. Adapter tests cover request shape, provider/network failures, and secret-safe error handling. GitHub Actions must pass before these changes are considered validated. OCR and extraction have not been implemented yet.
 
 ### Latest branch additions — validated in GitHub Actions run 134
 - Paginated workspace, batch, and image list endpoints with total-count metadata.
@@ -46,7 +46,7 @@ Project charter, master plan, architecture, roadmap, backlog, progress, decision
 
 ## Security and limitations
 
-- Authentication and workspace membership enforcement are implemented on the current branch, but a full security review and passing CI on the latest commit are required before public exposure. Auth throttling is in-memory and must be replaced with shared storage before multi-instance deployment. No real email delivery provider adapter is implemented or configured, so self-service signup/reset delivery cannot operate until a provider is approved, implemented, and configured.
+- Authentication and workspace membership enforcement are implemented on the current branch, but a full security review and passing CI on the latest commit are required before public exposure. Auth throttling is in-memory and must be replaced with shared storage before multi-instance deployment. The Resend email adapter is implemented but live delivery is not yet confirmed: set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` outside source control and use a verified sender domain. Auth throttling remains in-memory and requires shared storage before multi-instance deployment.
 - Subscription plans, quota enforcement, and payment gateway integration are not implemented. Do not expose this development preview publicly or upload sensitive/production data.
 - Keep `STORAGE_ROOT` and `UPLOAD_TEMP_ROOT` outside any public web root.
 - Never commit API keys, passwords, production data, or private images.
