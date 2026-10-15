@@ -36,7 +36,7 @@ test("self-service registration requires verification and supports session login
 
     const expiredVerificationToken = "expired-verification-token-for-test";
     await pool.query(
-      "INSERT INTO email_verification_tokens (user_id, token_hash, expires_at) VALUES ($1, $2, now() - interval '1 minute')",
+      "INSERT INTO email_verification_tokens (user_id, token_hash, created_at, expires_at) VALUES ($1, $2, now() - interval '2 hours', now() - interval '1 minute')",
       [userId, createHash("sha256").update(expiredVerificationToken).digest("hex")]
     );
     const expiredVerification = await request(app).post("/api/auth/verify-email").send({ token: expiredVerificationToken });
@@ -84,7 +84,7 @@ test("self-service registration requires verification and supports session login
     assert.ok(resetToken);
     const expiredResetToken = "expired-password-reset-token-for-test";
     await pool.query(
-      "INSERT INTO password_reset_tokens (user_id, token_hash, expires_at) VALUES ($1, $2, now() - interval '1 minute')",
+      "INSERT INTO password_reset_tokens (user_id, token_hash, created_at, expires_at) VALUES ($1, $2, now() - interval '2 hours', now() - interval '1 minute')",
       [userId, createHash("sha256").update(expiredResetToken).digest("hex")]
     );
     const expiredReset = await request(app).post("/api/auth/password-reset/confirm")
