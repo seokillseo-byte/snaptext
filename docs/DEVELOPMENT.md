@@ -20,6 +20,8 @@ Workspace, batch, and image endpoints require a verified account and a valid ses
 
 The web development server proxies `/api` to the API, preserving same-origin browser requests. For a deployment, serve the web app and API under the same origin through a trusted reverse proxy where possible. Set `TRUST_PROXY_HOPS` to the exact number of trusted proxy hops only when deployed behind a proxy; do not set it blindly. The session cookie is HttpOnly and SameSite=Lax, and is marked Secure when `NODE_ENV=production`.
 
+After Resend credentials and a verified sender address are configured, run a real provider connectivity check by setting `RESEND_TEST_TO_EMAIL` to a controlled inbox and running `npm --workspace @snaptext/api run email:smoke` from the repository root. The script sends a harmless message without verification/reset tokens, never prints credentials, and does not prove the full authentication flow. Then perform the full end-to-end checks below using a controlled test account:
+
 After Resend credentials and a verified sender address are configured, the expected flow is:
 1. Register an account in the web UI.
 2. Open the verification email and enter the one-time verification token.
