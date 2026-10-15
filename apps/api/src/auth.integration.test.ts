@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { after, test } from "node:test";
 import request from "supertest";
 import { app } from "./app.js";
@@ -26,10 +27,21 @@ test("self-service registration requires verification and supports session login
       .send({ email, password: "long-test-password-123", workspaceName: "Test customer workspace" });
     assert.equal(registration.status, 201);
     userId = registration.body.data.userId;
+    assert.equal("token" in registration.body, false);
+    assert.equal(JSON.stringify(registration.body).includes("verification token"), false);
     assert.equal(sent.length, 1);
     assert.match(sent[0].text, /one-time verification token/);
     const token = sent[0].text.match(/token[^:]*: ([A-Za-z0-9_-]+)/i)?.[1];
     assert.ok(token);
+
+    const expiredVerificationToken = "expired-verification-token-for-test";
+    await pool.query(
+      "INSERT INTO email_verification_tokens (user_id, token_hash, expires_at) VALUES ($1, $2, now() - interval '1 minute')",
+      [userId, createHash("sha256").update(expiredVerificationToken).digest("hex")]
+    );
+    const expiredVerification = await request(app).post("/api/auth/verify-email").send({ token: expiredVerificationToken });
+    assert.equal(expiredVerification.status, 400);
+    assert.equal(expiredVerification.body.error.code, "INVALID_VERIFICATION_TOKEN");
 
     const unverifiedLogin = await request(app)
       .post("/api/auth/login")
@@ -70,6 +82,16 @@ test("self-service registration requires verification and supports session login
     assert.equal(sent.length, 2);
     const resetToken = sent[1].text.match(/token: ([A-Za-z0-9_-]+)/i)?.[1];
     assert.ok(resetToken);
+    const expiredResetToken = "expired-password-reset-token-for-test";
+    await pool.query(
+      "INSERT INTO password_reset_tokens (user_id, token_hash, expires_at) VALUES ($1, $2, now() - interval '1 minute')",
+      [userId, createHash("sha256").update(expiredResetToken).digest("hex")]
+    );
+    const expiredReset = await request(app).post("/api/auth/password-reset/confirm")
+      .send({ token: expiredResetToken, password: "expired-reset-password-999" });
+    assert.equal(expiredReset.status, 400);
+    assert.equal(expiredReset.body.error.code, "INVALID_RESET_TOKEN");
+
     const reset = await request(app).post("/api/auth/password-reset/confirm")
       .send({ token: resetToken, password: "new-long-test-password-456" });
     assert.equal(reset.status, 200);
