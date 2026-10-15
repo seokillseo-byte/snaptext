@@ -5,10 +5,11 @@ SnapText is a customer-facing SaaS: self-service signup, monthly/yearly subscrip
 
 ## Immediate next action — validate Resend integration and finish Phase 1
 1. Confirm GitHub Actions passes for the latest commit; fix failures without weakening CI.
-2. In the deployment/runtime environment only, configure `RESEND_API_KEY` and `RESEND_FROM_EMAIL`; verify the sender domain in Resend. Do not commit API keys or paste secrets into chat.
-3. Run a real email smoke test for registration verification and password reset using a controlled test account. Confirm the message arrives, the token is usable only once and before expiry, and no token or credential appears in logs/API responses.
-4. Review auth audit failures, token/session lifecycle, process-local rate-limit memory growth, multi-instance rate limiting, and cookie/origin behavior behind the actual reverse proxy.
-5. Update progress and CI evidence. Do not expose publicly or start subscription/payment implementation until Phase 1 release gates are met.
+2. In the API runtime environment only, configure `RESEND_API_KEY` and `RESEND_FROM_EMAIL`; verify the sender domain in Resend. Do not commit API keys or paste secrets into chat.
+3. Set `RESEND_TEST_TO_EMAIL` to a controlled inbox and run `npm --workspace @snaptext/api run email:smoke` from the repository root. Confirm the message arrives and review Resend delivery logs.
+4. Run controlled end-to-end signup/verification and password-reset tests. Confirm each token works once and before expiry, and no token or credential appears in logs/API responses.
+5. Review auth audit failures, token/session lifecycle, process-local rate-limit memory growth, multi-instance rate limiting, and cookie/origin behavior behind the actual reverse proxy.
+6. Update progress and CI evidence. Do not expose publicly or start subscription/payment implementation until Phase 1 release gates are met.
 
 ## Decisions deliberately not invented
 - Email provider: Resend selected and adapter implemented. API key and sender identity are runtime configuration, not source-code values.
