@@ -7,16 +7,21 @@
 - [x] Paginated workspace/batch/image list and detail APIs with scope/privacy tests.
 - [x] Genuine npm lockfile and npm ci in CI; passing workflow evidence recorded.
 
-## P0 — Phase 1: SaaS identity and tenant isolation (next)
-- [ ] Inspect dependencies, migrations, route/service/repository conventions, frontend routing, and test fixtures.
+## P0 — Phase 1: SaaS identity and tenant isolation (in progress)
+- [x] Inspect current dependencies, migrations, route/service/repository conventions, frontend routing, and test fixtures.
 - [ ] Record ADR for maintained auth/session library, email verification and password-reset approach.
-- [ ] Add users, workspace memberships/roles, sessions, hashed verification/reset tokens, and audit events in a new migration.
-- [ ] Implement self-service register, email verification, login/logout, password reset and session revocation.
+- [x] Add users, workspace memberships/roles, sessions, hashed verification/reset tokens, and audit events in migration 002.
+- [x] Implement API endpoints for register, email verification, login/logout, password reset, and session revocation on password reset.
 - [ ] Add auth middleware and workspace authorization; client-provided IDs must not establish ownership.
-- [ ] Apply tenant scoping to every existing workspace/batch/image list/detail/create/upload API.
+- [x] Scope workspace listing to membership and protect existing workspace/batch/image routes with membership checks.
 - [ ] Add rate limits, secure cookie/CSRF strategy, security headers, safe config examples, and no-secret logging.
-- [ ] Test anonymous denial, cross-tenant IDOR read/write, token expiry/replay, session revocation, and regressions.
-- [ ] Update README/project docs and verify CI.
+- [x] Add integration tests for anonymous denial, registration/verification replay, login/logout, and cross-tenant workspace read/write denial.
+- [ ] Add expiry/replay coverage for password reset and expired sessions; confirm current CI passes.
+- [x] Update README, progress log, next-action handoff, and PR description.
+- [ ] Verify latest GitHub Actions run and fix any failures.
+
+## Phase 1 blocker
+- [ ] Select/configure an email delivery provider behind EmailSender; current implementation fails closed when no provider is configured, so customer signup cannot complete until this is done.
 
 ## P0 — Phase 2: Subscription and quotas
 - [ ] Define configurable plan/limit fields without inventing prices or customer-facing quota values.
