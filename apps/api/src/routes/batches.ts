@@ -7,6 +7,7 @@ import { getPool } from "../db/pool.js";
 import { PostgresBatchRepository } from "../repositories/postgresBatchRepository.js";
 import { BatchService, type UploadedImage } from "../services/batchService.js";
 import { LocalImageStorage } from "../storage/localImageStorage.js";
+import { requireWorkspaceMembership } from "../middleware/authentication.js";
 
 const maxFiles = Number.parseInt(process.env.UPLOAD_MAX_FILES ?? "20", 10);
 const maxFileSizeMb = Number.parseInt(process.env.UPLOAD_MAX_FILE_SIZE_MB ?? "10", 10);
@@ -32,6 +33,7 @@ const upload = multer({
 });
 const storage = new LocalImageStorage();
 export const batchesRouter = Router();
+batchesRouter.use("/workspaces/:workspaceId", requireWorkspaceMembership);
 
 function service(): BatchService {
   return new BatchService(new PostgresBatchRepository(getPool()), storage);
@@ -75,7 +77,7 @@ function readPagination(request: import("express").Request): { page: number; pag
 batchesRouter.get("/workspaces", async (request, response) => {
   try {
     const { page, pageSize } = readPagination(request);
-    response.status(200).json({ data: await service().listWorkspaces(page, pageSize) });
+    response.status(200).json({ data: await service().listWorkspaces(request.authUser!.id, page, pageSize) });
   } catch (error) {
     routeError(error, response);
   }
@@ -134,7 +136,7 @@ batchesRouter.get("/workspaces/:workspaceId/batches/:batchId/images/:imageId", a
 batchesRouter.post("/workspaces", async (request, response) => {
   try {
     const name = typeof request.body?.name === "string" ? request.body.name : "";
-    const workspace = await service().createWorkspace(name);
+    const workspace = await service().createWorkspace(name, request.authUser!.id);
     response.status(201).json({ data: workspace });
   } catch (error) {
     routeError(error, response);
