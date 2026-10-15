@@ -11,17 +11,19 @@
 - [x] Inspect current dependencies, migrations, route/service/repository conventions, frontend routing, and test fixtures.
 - [ ] Record ADR for maintained auth/session library, email verification and password-reset approach.
 - [x] Add users, workspace memberships/roles, sessions, hashed verification/reset tokens, and audit events in migration 002.
-- [x] Implement API endpoints for register, email verification, login/logout, password reset, and session revocation on password reset.
+- [x] Implement API endpoints for register, email verification, login/logout, password-reset request/confirmation, and session revocation on password reset.
+- [x] Add customer signup, login, email verification, password-reset request/confirmation, and sign-out screens.
 - [ ] Add auth middleware and workspace authorization; client-provided IDs must not establish ownership.
 - [x] Scope workspace listing to membership and protect existing workspace/batch/image routes with membership checks.
 - [ ] Add rate limits, secure cookie/CSRF strategy, security headers, safe config examples, and no-secret logging.
 - [x] Add integration tests for anonymous denial, registration/verification replay, login/logout, and cross-tenant workspace read/write denial.
-- [ ] Add expiry/replay coverage for password reset and expired sessions; confirm current CI passes.
+- [x] Add integration tests for password-reset replay, session expiry, registration/verification, login/logout, and cross-tenant workspace access.
+- [ ] Add explicit expiry tests for password-reset and email-verification tokens; review audit/error behavior.
 - [x] Update README, progress log, next-action handoff, and PR description.
 - [ ] Verify latest GitHub Actions run and fix any failures.
 
 ## Phase 1 blocker
-- [ ] Select/configure an email delivery provider behind EmailSender; current implementation fails closed when no provider is configured, so customer signup cannot complete until this is done.
+- [ ] Select, implement, and configure a real email delivery provider behind EmailSender; registration currently fails closed and reset delivery is disabled without a provider.
 
 ## P0 — Phase 2: Subscription and quotas
 - [ ] Define configurable plan/limit fields without inventing prices or customer-facing quota values.
