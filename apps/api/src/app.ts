@@ -9,6 +9,11 @@ import { batchesRouter } from "./routes/batches.js";
 export const app = express();
 
 app.disable("x-powered-by");
+const trustProxyHops = Number.parseInt(process.env.TRUST_PROXY_HOPS ?? "0", 10);
+if (!Number.isInteger(trustProxyHops) || trustProxyHops < 0 || trustProxyHops > 5) {
+  throw new Error("TRUST_PROXY_HOPS must be an integer between 0 and 5.");
+}
+if (trustProxyHops > 0) app.set("trust proxy", trustProxyHops);
 app.use(helmet());
 const allowedOrigins = new Set((process.env.CORS_ORIGIN ?? "").split(",").map((value) => value.trim()).filter(Boolean));
 app.use(cors({
