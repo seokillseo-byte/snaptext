@@ -72,7 +72,8 @@ export function requireSameOrigin(request: Request, response: Response, next: Ne
 }
 
 export async function requireWorkspaceMembership(request: Request, response: Response, next: NextFunction): Promise<void> {
-  const workspaceId = request.params.workspaceId;
+  const workspaceIdValue = request.params.workspaceId;
+  const workspaceId = Array.isArray(workspaceIdValue) ? workspaceIdValue[0] : workspaceIdValue;
   const userId = request.authUser?.id;
   if (!workspaceId || !userId) {
     response.status(401).json({ error: { code: "AUTHENTICATION_REQUIRED", message: "Please sign in to continue." } });
