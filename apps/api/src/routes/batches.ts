@@ -7,7 +7,7 @@ import { getPool } from "../db/pool.js";
 import { PostgresBatchRepository } from "../repositories/postgresBatchRepository.js";
 import { BatchService, type UploadedImage } from "../services/batchService.js";
 import { LocalImageStorage } from "../storage/localImageStorage.js";
-import { requireWorkspaceMembership } from "../middleware/authentication.js";
+import { requireAuthentication, requireWorkspaceMembership } from "../middleware/authentication.js";
 
 const maxFiles = Number.parseInt(process.env.UPLOAD_MAX_FILES ?? "20", 10);
 const maxFileSizeMb = Number.parseInt(process.env.UPLOAD_MAX_FILE_SIZE_MB ?? "10", 10);
@@ -33,6 +33,7 @@ const upload = multer({
 });
 const storage = new LocalImageStorage();
 export const batchesRouter = Router();
+batchesRouter.use(requireAuthentication);
 batchesRouter.use("/workspaces/:workspaceId", requireWorkspaceMembership);
 
 function service(): BatchService {
