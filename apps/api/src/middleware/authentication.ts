@@ -78,6 +78,10 @@ export async function requireWorkspaceMembership(request: Request, response: Res
     response.status(401).json({ error: { code: "AUTHENTICATION_REQUIRED", message: "Please sign in to continue." } });
     return;
   }
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(workspaceId)) {
+    response.status(404).json({ error: { code: "WORKSPACE_NOT_FOUND", message: "Workspace was not found." } });
+    return;
+  }
   try {
     const result = await getPool().query(
       "SELECT 1 FROM workspace_memberships WHERE workspace_id = $1 AND user_id = $2",
