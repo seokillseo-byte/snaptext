@@ -15,7 +15,7 @@ Implemented and validated in GitHub Actions:
 - Configurable file count, per-file size, and combined request-size limits.
 - Integration tests for valid image upload, fake image rejection, duplicate detection, request-size rejection, and temporary-file cleanup.
 
-The upload workflow is available in the development UI. OCR and extraction have not been implemented yet.
+The customer authentication screens and API have been added on the current Draft PR. Registration uses a fail-closed email-sender adapter: the operator must configure a real delivery provider before customers can complete signup and email verification. OCR and extraction have not been implemented yet.
 
 ### Latest branch additions — validated in GitHub Actions run 134
 - Paginated workspace, batch, and image list endpoints with total-count metadata.
@@ -46,7 +46,8 @@ Project charter, master plan, architecture, roadmap, backlog, progress, decision
 
 ## Security and limitations
 
-- There is no authentication or workspace authorization yet. Do not expose this development preview publicly or upload sensitive/production data.
+- Authentication and workspace membership enforcement are implemented in the current branch but still require the current GitHub Actions run to pass and a full security review before public exposure. Email delivery is not configured, so self-service signup cannot complete until an email provider adapter is configured.
+- Subscription plans, quota enforcement, and payment gateway integration are not implemented. Do not expose this development preview publicly or upload sensitive/production data.
 - Keep `STORAGE_ROOT` and `UPLOAD_TEMP_ROOT` outside any public web root.
 - Never commit API keys, passwords, production data, or private images.
 - Use synthetic or properly licensed sample images in automated tests.
