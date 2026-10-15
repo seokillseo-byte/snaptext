@@ -6,6 +6,7 @@ import request from "supertest";
 import { app } from "./app.js";
 import { closePool, getPool } from "./db/pool.js";
 import { LocalImageStorage } from "./storage/localImageStorage.js";
+import { createTestSession } from "./testing/testSession.js";
 
 const databaseAvailable = Boolean(process.env.DATABASE_URL);
 const tinyPng = Buffer.from(
@@ -21,6 +22,11 @@ test("workspace batch upload validates actual file content and flags duplicates"
   skip: !databaseAvailable
 }, async () => {
   const pool = getPool();
+  const testSession = await createTestSession(pool);
+  const api = {
+    get: (url: string) => request(app).get(url).set("Cookie", testSession.cookie),
+    post: (url: string) => request(app).post(url).set("Cookie", testSession.cookie)
+  };
   const storage = new LocalImageStorage();
   let workspaceId: string | undefined;
 
@@ -70,6 +76,7 @@ test("workspace batch upload validates actual file content and flags duplicates"
     if (workspaceId) {
       await pool.query("DELETE FROM workspaces WHERE id = $1", [workspaceId]);
     }
+    await testSession.cleanup();
   }
 });
 
@@ -77,6 +84,11 @@ test("combined upload limit returns 413 and removes temporary files", {
   skip: !databaseAvailable
 }, async () => {
   const pool = getPool();
+  const testSession = await createTestSession(pool);
+  const api = {
+    get: (url: string) => request(app).get(url).set("Cookie", testSession.cookie),
+    post: (url: string) => request(app).post(url).set("Cookie", testSession.cookie)
+  };
   const tempRoot = path.resolve(process.env.UPLOAD_TEMP_ROOT ?? path.resolve(process.cwd(), ".snaptext-data/tmp"));
   let workspaceId: string | undefined;
 
