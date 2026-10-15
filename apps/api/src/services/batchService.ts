@@ -68,12 +68,12 @@ export class BatchService {
     private readonly storage: ImageStorage
   ) {}
 
-  async createWorkspace(name: string): Promise<{ id: string; name: string; createdAt: string }> {
+  async createWorkspace(name: string, ownerUserId: string): Promise<{ id: string; name: string; createdAt: string }> {
     const normalizedName = name.trim();
     if (normalizedName.length < 1 || normalizedName.length > 160) {
       throw Object.assign(new Error("Workspace name must be between 1 and 160 characters."), { statusCode: 400, code: "INVALID_WORKSPACE_NAME" });
     }
-    return this.repository.createWorkspace(normalizedName);
+    return this.repository.createWorkspace(normalizedName, ownerUserId);
   }
 
 
@@ -86,9 +86,9 @@ export class BatchService {
     return workspace;
   }
 
-  async listWorkspaces(page = 1, pageSize = 20) {
+  async listWorkspaces(userId: string, page = 1, pageSize = 20) {
     const pagination = normalizePagination(page, pageSize);
-    const result = await this.repository.listWorkspaces(pagination.pageSize, (pagination.page - 1) * pagination.pageSize);
+    const result = await this.repository.listWorkspaces(userId, pagination.pageSize, (pagination.page - 1) * pagination.pageSize);
     return {
       items: result.items,
       pagination: { ...pagination, total: result.total, totalPages: Math.ceil(result.total / pagination.pageSize) }
