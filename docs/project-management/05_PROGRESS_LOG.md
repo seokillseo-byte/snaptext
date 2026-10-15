@@ -59,3 +59,12 @@
 - Updated `.env.example`, README, local development guide, backlog, and next-action handoff. No real API key was added to source control.
 - GitHub Actions run 270 passed migrations, API tests (including the new Resend adapter tests), TypeScript checks, and production build for implementation commit `e75ce20d9cf3980c9fac4304ec46f04b6222b597`: https://github.com/seokillseo-byte/snaptext/actions/runs/38725845987. No local test run was performed. Live email delivery still requires the owner to configure secrets in the runtime environment and use a sender address from a verified Resend domain.
 - PR #1 remains Draft/open. No merge or deployment was performed.
+
+
+## 2026-10-15 — Resend live-delivery smoke-test support
+- Added `apps/api/src/scripts/resend-smoke-test.ts` and API workspace command `npm --workspace @snaptext/api run email:smoke`.
+- The script requires `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and an explicitly configured `RESEND_TEST_TO_EMAIL`; it sends a harmless email without account tokens, prints no credentials, and returns generic failure guidance.
+- Documented the manual smoke-test and controlled signup/verification/password-reset test sequence in development instructions, README, next-action handoff, and backlog.
+- No Resend API key or live recipient was added to source control. A real delivery test cannot be performed until the owner configures runtime secrets and chooses a controlled inbox.
+- CI validation for the latest smoke-test/docs commits is pending; check the latest run before considering the work fully validated. No local test run was performed.
+- PR #1 remains Draft/open; no merge or deployment was performed.
