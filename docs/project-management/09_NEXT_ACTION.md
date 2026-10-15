@@ -3,15 +3,15 @@
 ## Current status
 SnapText is a customer-facing SaaS: self-service signup, monthly/yearly subscriptions with server-enforced limits, and automated gateway payment. Foundation code includes React + TypeScript + Vite, Express + TypeScript, PostgreSQL migrations, private multi-image upload, and paginated workspace/batch/image APIs. Architecture and project plans are updated. ADR-001 records the identity/tenant-security direction. PR #1 remains Draft/open; no merge or deployment without explicit approval.
 
-## Immediate next action — Phase 1 (GitHub Issue #2): Identity and tenant isolation
+## Immediate next action — finish Phase 1 (GitHub Issue #2): Identity and tenant isolation
 Issue: https://github.com/seokillseo-byte/snaptext/issues/2
 
-1. Inspect current dependencies, API route/service/repository layering, migration conventions, frontend routing, and test fixtures on branch foundation/project-bootstrap.
-2. Finalize auth/session implementation details against the actual dependency tree; use maintained libraries and npm-generated lockfile updates.
-3. Implement users, workspace memberships/roles, sessions/tokens, self-service auth lifecycle, and authorization on every existing workspace/batch/image route.
-4. Add migrations only; do not rewrite existing migrations.
-5. Test anonymous access, cross-tenant IDOR reads/writes, token expiry/replay, session revocation, and existing workflow regressions.
-6. Update docs and run GitHub Actions. Do not begin payment integration until tenant security and plan/quota foundations are in place.
+1. Verify the current GitHub Actions run and fix any migration, test, TypeScript, or build failures.
+2. Add missing integration coverage for password-reset expiry/replay and expired sessions; review auth audit/error behavior.
+3. Choose and configure an email delivery provider behind the existing EmailSender interface; test verification and reset delivery without exposing tokens in logs or API responses.
+4. Review the in-memory authentication rate limiter and decide whether to use a shared store before multi-instance deployment.
+5. Confirm cookie/CORS/reverse-proxy settings for the actual deployment origin.
+6. Re-run CI and complete a security review. Do not begin public exposure, subscriptions, or payment integration until tenant-isolation gates pass.
 
 ## Decisions deliberately not invented
 - Gateway: not selected. Compare Vietnam merchant eligibility, VND/local methods, recurring billing, webhooks, refunds, sandbox and fees; recommend one for owner approval.
