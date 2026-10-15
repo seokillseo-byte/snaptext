@@ -62,6 +62,27 @@ test("self-service registration requires verification and supports session login
     assert.equal(logout.status, 204);
     const afterLogout = await request(app).get("/api/auth/me").set("Cookie", cookie);
     assert.equal(afterLogout.status, 401);
+
+    const resetRequest = await request(app).post("/api/auth/password-reset/request").send({ email });
+    assert.equal(resetRequest.status, 202);
+    assert.equal(sent.length, 2);
+    const resetToken = sent[1].text.match(/token: ([A-Za-z0-9_-]+)/i)?.[1];
+    assert.ok(resetToken);
+    const reset = await request(app).post("/api/auth/password-reset/confirm")
+      .send({ token: resetToken, password: "new-long-test-password-456" });
+    assert.equal(reset.status, 200);
+    const replayReset = await request(app).post("/api/auth/password-reset/confirm")
+      .send({ token: resetToken, password: "another-long-password-789" });
+    assert.equal(replayReset.status, 400);
+    const oldPasswordLogin = await request(app).post("/api/auth/login")
+      .send({ email, password: "long-test-password-123" });
+    assert.equal(oldPasswordLogin.status, 401);
+    const newPasswordLogin = await request(app).post("/api/auth/login")
+      .send({ email, password: "new-long-test-password-456" });
+    assert.equal(newPasswordLogin.status, 200);
+    const newCookie = (newPasswordLogin.headers["set-cookie"] as string[])[0].split(";")[0];
+    const currentUser = await request(app).get("/api/auth/me").set("Cookie", newCookie);
+    assert.equal(currentUser.status, 200);
   } finally {
     if (userId) {
       await pool.query("DELETE FROM workspaces WHERE id IN (SELECT workspace_id FROM workspace_memberships WHERE user_id = $1)", [userId]);
@@ -97,6 +118,10 @@ test("workspace APIs deny cross-tenant reads and writes", {
       .post(`/api/workspaces/${workspaceB}/batches`)
       .set("Cookie", userA.cookie).send({ name: "Unauthorized batch" });
     assert.equal(createBatchInBAsA.status, 404);
+
+    await pool.query("UPDATE auth_sessions SET expires_at = now() - interval '1 minute' WHERE user_id = $1", [userA.userId]);
+    const expiredSession = await request(app).get("/api/auth/me").set("Cookie", userA.cookie);
+    assert.equal(expiredSession.status, 401);
 
     const listAsA = await request(app).get("/api/workspaces").set("Cookie", userA.cookie);
     assert.equal(listAsA.status, 200);
