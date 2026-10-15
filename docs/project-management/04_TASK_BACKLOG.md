@@ -26,7 +26,8 @@
 - [x] Implement Resend HTTPS email adapter behind EmailSender using `RESEND_API_KEY` and `RESEND_FROM_EMAIL`; no API key is stored in the repository.
 - [x] Add adapter tests for request payload/auth header, provider failures, network failures, and secret-safe errors; include service tests in the CI test command.
 - [x] Document environment configuration and verified-sender requirement.
-- [ ] Configure secrets in the deployment environment and verify live email delivery for both registration and password reset.
+- [x] Add a safe manual smoke-test script that sends a harmless message to `RESEND_TEST_TO_EMAIL` without logging credentials or account tokens.
+- [ ] Configure secrets in the runtime environment, verify the sender domain, and run the smoke test plus controlled registration/password-reset end-to-end checks.
 - [ ] Complete auth security review and confirm passing CI before Phase 1 release readiness.
 
 ## P0 — Phase 2: Subscription and quotas
