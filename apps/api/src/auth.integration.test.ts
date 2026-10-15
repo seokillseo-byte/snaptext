@@ -123,8 +123,13 @@ test("workspace APIs deny cross-tenant reads and writes", {
     assert.equal(listAsA.status, 200);
     assert.deepEqual(listAsA.body.data.items.map((item: { id: string }) => item.id), [workspaceA]);
 
-    await pool.query("UPDATE auth_sessions SET expires_at = now() - interval '1 minute' WHERE user_id = $1", [userA.userId]);
-    const expiredSession = await request(app).get("/api/auth/me").set("Cookie", userA.cookie);
+    const expiredToken = "expired-session-token-for-test";
+    const { createHash } = await import("node:crypto");
+    await pool.query(
+      "INSERT INTO auth_sessions (user_id, token_hash, created_at, expires_at) VALUES ($1, $2, now() - interval '2 hours', now() - interval '1 hour')",
+      [userA.userId, createHash("sha256").update(expiredToken).digest("hex")]
+    );
+    const expiredSession = await request(app).get("/api/auth/me").set("Cookie", `snaptext_session=${expiredToken}`);
     assert.equal(expiredSession.status, 401);
   } finally {
     if (workspaceA) await pool.query("DELETE FROM workspaces WHERE id = $1", [workspaceA]);
