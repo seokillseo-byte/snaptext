@@ -2,7 +2,7 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import { getPool } from "./db/pool.js";
-import { requireAuthentication, requireSameOrigin } from "./middleware/authentication.js";
+import { requireSameOrigin } from "./middleware/authentication.js";
 import { authRouter } from "./routes/auth.js";
 import { batchesRouter } from "./routes/batches.js";
 
@@ -45,7 +45,7 @@ app.get("/api/health/ready", async (_request, response) => {
 });
 
 app.use("/api/auth", authRouter);
-app.use("/api", requireAuthentication, batchesRouter);
+app.use("/api", batchesRouter);
 
 app.use((_request, response) => {
   response.status(404).json({
