@@ -119,13 +119,13 @@ test("workspace APIs deny cross-tenant reads and writes", {
       .set("Cookie", userA.cookie).send({ name: "Unauthorized batch" });
     assert.equal(createBatchInBAsA.status, 404);
 
-    await pool.query("UPDATE auth_sessions SET expires_at = now() - interval '1 minute' WHERE user_id = $1", [userA.userId]);
-    const expiredSession = await request(app).get("/api/auth/me").set("Cookie", userA.cookie);
-    assert.equal(expiredSession.status, 401);
-
     const listAsA = await request(app).get("/api/workspaces").set("Cookie", userA.cookie);
     assert.equal(listAsA.status, 200);
     assert.deepEqual(listAsA.body.data.items.map((item: { id: string }) => item.id), [workspaceA]);
+
+    await pool.query("UPDATE auth_sessions SET expires_at = now() - interval '1 minute' WHERE user_id = $1", [userA.userId]);
+    const expiredSession = await request(app).get("/api/auth/me").set("Cookie", userA.cookie);
+    assert.equal(expiredSession.status, 401);
   } finally {
     if (workspaceA) await pool.query("DELETE FROM workspaces WHERE id = $1", [workspaceA]);
     if (workspaceB) await pool.query("DELETE FROM workspaces WHERE id = $1", [workspaceB]);
