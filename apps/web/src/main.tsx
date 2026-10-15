@@ -47,10 +47,11 @@ function App() {
   const [result, setResult] = useState<UploadResult | null>(null);
   const [authUser, setAuthUser] = useState<{ id: string; email: string } | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
-  const [authMode, setAuthMode] = useState<"login" | "register" | "verify">("login");
+  const [authMode, setAuthMode] = useState<"login" | "register" | "verify" | "reset-request" | "reset-confirm">("login");
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [verificationToken, setVerificationToken] = useState("");
+  const [resetToken, setResetToken] = useState("");
   const [authBusy, setAuthBusy] = useState(false);
   const [authError, setAuthError] = useState("");
   const [authNotice, setAuthNotice] = useState("");
@@ -94,6 +95,24 @@ function App() {
         setAuthMode("verify");
         setAuthPassword("");
         setAuthNotice("Registration started. Check your email for the one-time verification token.");
+      } else if (authMode === "reset-request") {
+        await readJson(await fetch("/api/auth/password-reset/request", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: authEmail })
+        }));
+        setAuthMode("reset-confirm");
+        setAuthNotice("If the account exists, reset instructions will be sent. Enter the token from your email when it arrives.");
+      } else if (authMode === "reset-confirm") {
+        await readJson(await fetch("/api/auth/password-reset/confirm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: resetToken.trim(), password: authPassword })
+        }));
+        setAuthMode("login");
+        setAuthPassword("");
+        setResetToken("");
+        setAuthNotice("Password updated. Sign in with your new password.");
       } else {
         const payload = await readJson(await fetch("/api/auth/login", {
           method: "POST",
@@ -134,23 +153,25 @@ function App() {
         </header>
         <section className="auth-panel">
           <div className="eyebrow"><ShieldCheck size={15} /> PRIVATE CUSTOMER WORKSPACE</div>
-          <h1>{authMode === "register" ? "Create your account." : authMode === "verify" ? "Verify your email." : "Welcome back."}</h1>
-          <p className="auth-muted">{authMode === "register" ? "Create a SnapText account and your own isolated workspace." : authMode === "verify" ? "Enter the one-time token sent to your email address." : "Sign in to manage image batches and extracted data."}</p>
+          <h1>{authMode === "register" ? "Create your account." : authMode === "verify" ? "Verify your email." : authMode === "reset-request" ? "Reset your password." : authMode === "reset-confirm" ? "Choose a new password." : "Welcome back."}</h1>
+          <p className="auth-muted">{authMode === "register" ? "Create a SnapText account and your own isolated workspace." : authMode === "verify" ? "Enter the one-time token sent to your email address." : authMode === "reset-request" ? "Request a one-time password reset token." : authMode === "reset-confirm" ? "Enter the token from your email and choose a new password." : "Sign in to manage image batches and extracted data."}</p>
           <form className="auth-form" onSubmit={submitAuth}>
-            {authMode !== "verify" && <>
-              <label>Email address<input type="email" autoComplete="email" value={authEmail} onChange={(event) => setAuthEmail(event.target.value)} required maxLength={320} disabled={authBusy} /></label>
-              <label>Password<input type="password" autoComplete={authMode === "login" ? "current-password" : "new-password"} value={authPassword} onChange={(event) => setAuthPassword(event.target.value)} required minLength={12} maxLength={128} disabled={authBusy} /><small>Use 12–128 characters.</small></label>
-              {authMode === "register" && <label>Workspace name<input value={workspaceName} onChange={(event) => setWorkspaceName(event.target.value)} required minLength={1} maxLength={160} disabled={authBusy} /></label>}
-            </>}
+            {["login", "register", "reset-request"].includes(authMode) && <label>Email address<input type="email" autoComplete="email" value={authEmail} onChange={(event) => setAuthEmail(event.target.value)} required maxLength={320} disabled={authBusy} /></label>}
+            {["login", "register", "reset-confirm"].includes(authMode) && <label>{authMode === "reset-confirm" ? "New password" : "Password"}<input type="password" autoComplete={authMode === "login" ? "current-password" : "new-password"} value={authPassword} onChange={(event) => setAuthPassword(event.target.value)} required minLength={12} maxLength={128} disabled={authBusy} /><small>Use 12–128 characters.</small></label>}
+            {authMode === "register" && <label>Workspace name<input value={workspaceName} onChange={(event) => setWorkspaceName(event.target.value)} required minLength={1} maxLength={160} disabled={authBusy} /></label>}
             {authMode === "verify" && <label>Verification token<input value={verificationToken} onChange={(event) => setVerificationToken(event.target.value)} required minLength={20} maxLength={200} autoComplete="one-time-code" disabled={authBusy} /></label>}
-            <button className="primary-action auth-submit" type="submit" disabled={authBusy}>{authBusy ? "Please wait…" : authMode === "register" ? "Create account" : authMode === "verify" ? "Verify email" : "Sign in"} <ArrowRight size={16} /></button>
+            {authMode === "reset-confirm" && <label>Password reset token<input value={resetToken} onChange={(event) => setResetToken(event.target.value)} required minLength={20} maxLength={200} autoComplete="one-time-code" disabled={authBusy} /></label>}
+            <button className="primary-action auth-submit" type="submit" disabled={authBusy}>{authBusy ? "Please wait…" : authMode === "register" ? "Create account" : authMode === "verify" ? "Verify email" : authMode === "reset-request" ? "Send reset instructions" : authMode === "reset-confirm" ? "Update password" : "Sign in"} <ArrowRight size={16} /></button>
           </form>
           {authNotice && <p className="status-message" role="status">{authNotice}</p>}
           {authError && <p className="error-message" role="alert">{authError}</p>}
           <div className="auth-links">
             {authMode === "login" && <button type="button" onClick={() => { setAuthMode("register"); setAuthError(""); setAuthNotice(""); }}>Create an account</button>}
             {authMode === "register" && <button type="button" onClick={() => { setAuthMode("login"); setAuthError(""); setAuthNotice(""); }}>Already have an account? Sign in</button>}
-            {authMode !== "verify" && <button type="button" onClick={() => { setAuthMode("verify"); setAuthError(""); setAuthNotice(""); }}>Verify email with a token</button>}
+            {authMode === "login" && <button type="button" onClick={() => { setAuthMode("reset-request"); setAuthError(""); setAuthNotice(""); }}>Forgot password?</button>}
+            {authMode !== "verify" && authMode !== "reset-confirm" && authMode !== "reset-request" && <button type="button" onClick={() => { setAuthMode("verify"); setAuthError(""); setAuthNotice(""); }}>Verify email with a token</button>}
+            {authMode === "reset-confirm" && <button type="button" onClick={() => { setAuthMode("reset-request"); setAuthError(""); setAuthNotice(""); }}>Request another reset token</button>}
+            {authMode === "reset-request" && <button type="button" onClick={() => { setAuthMode("login"); setAuthError(""); setAuthNotice(""); }}>Back to sign in</button>}
             {authMode === "verify" && <button type="button" onClick={() => { setAuthMode("login"); setAuthError(""); setAuthNotice(""); }}>Back to sign in</button>}
           </div>
           <p className="auth-footnote">Your workspace is private to your account. Email delivery must be configured by the service operator before registration can complete.</p>
