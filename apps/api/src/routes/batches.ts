@@ -33,7 +33,7 @@ const upload = multer({
 });
 const storage = new LocalImageStorage();
 export const batchesRouter = Router();
-batchesRouter.use(requireAuthentication);
+batchesRouter.use("/workspaces", requireAuthentication);
 batchesRouter.use("/workspaces/:workspaceId", requireWorkspaceMembership);
 
 function service(): BatchService {
