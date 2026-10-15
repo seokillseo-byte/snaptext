@@ -57,5 +57,5 @@
 - Adapter maps provider/network/invalid-response failures to a generic error and does not include provider response bodies, API credentials, or raw network error details in thrown messages.
 - Added unit tests for endpoint, bearer authorization, message payload, timeout signal, provider failure secrecy, network failure secrecy, and blank configuration rejection. Updated API test script so service-level tests run in CI.
 - Updated `.env.example`, README, local development guide, backlog, and next-action handoff. No real API key was added to source control.
-- CI has not yet been verified for these latest changes; no local test run was performed. Live email delivery still requires the owner to configure secrets in the runtime environment and use a sender address from a verified Resend domain.
+- GitHub Actions run 270 passed migrations, API tests (including the new Resend adapter tests), TypeScript checks, and production build for implementation commit `e75ce20d9cf3980c9fac4304ec46f04b6222b597`: https://github.com/seokillseo-byte/snaptext/actions/runs/38725845987. No local test run was performed. Live email delivery still requires the owner to configure secrets in the runtime environment and use a sender address from a verified Resend domain.
 - PR #1 remains Draft/open. No merge or deployment was performed.
