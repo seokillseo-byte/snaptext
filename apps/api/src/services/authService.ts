@@ -106,6 +106,7 @@ export class AuthService {
         text: `Use this one-time verification token to verify your SnapText account: ${token}\nThis token expires in 24 hours.`
       });
     } catch (error) {
+      await this.pool.query("DELETE FROM workspaces WHERE id IN (SELECT workspace_id FROM workspace_memberships WHERE user_id = $1 AND role = 'OWNER')", [userId!]).catch(() => undefined);
       await this.pool.query("DELETE FROM users WHERE id = $1 AND email_verified_at IS NULL", [userId!]).catch(() => undefined);
       throw error;
     }
@@ -179,7 +180,8 @@ export class AuthService {
       });
     } catch (error) {
       await this.pool.query("DELETE FROM password_reset_tokens WHERE token_hash = $1", [sha256(token)]);
-      throw error;
+      // Keep the public response generic and avoid revealing whether an account exists.
+      return;
     }
   }
 
