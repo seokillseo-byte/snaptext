@@ -9,18 +9,18 @@
 
 ## P0 — Phase 1: SaaS identity and tenant isolation (in progress)
 - [x] Inspect current dependencies, migrations, route/service/repository conventions, frontend routing, and test fixtures.
-- [ ] Record ADR for maintained auth/session library, email verification and password-reset approach.
+- [x] Record ADR for the identity/session, email-verification, and password-reset approach.
 - [x] Add users, workspace memberships/roles, sessions, hashed verification/reset tokens, and audit events in migration 002.
 - [x] Implement API endpoints for register, email verification, login/logout, password-reset request/confirmation, and session revocation on password reset.
 - [x] Add customer signup, login, email verification, password-reset request/confirmation, and sign-out screens.
-- [ ] Add auth middleware and workspace authorization; client-provided IDs must not establish ownership.
+- [x] Add auth middleware and workspace authorization; client-provided IDs must not establish ownership.
 - [x] Scope workspace listing to membership and protect existing workspace/batch/image routes with membership checks.
-- [ ] Add rate limits, secure cookie/CSRF strategy, security headers, safe config examples, and no-secret logging.
+- [x] Add per-IP/per-route auth throttling, HttpOnly/SameSite cookies, same-origin checks, security headers, safe config examples, and avoid token values in API responses; distributed throttling and deployment review remain open.
 - [x] Add integration tests for anonymous denial, registration/verification replay, login/logout, and cross-tenant workspace read/write denial.
 - [x] Add integration tests for password-reset replay, session expiry, registration/verification, login/logout, and cross-tenant workspace access.
-- [ ] Add explicit expiry tests for password-reset and email-verification tokens; review audit/error behavior.
+- [x] Add integration tests proving expired password-reset and email-verification tokens are rejected; review audit/error behavior further before release.
 - [x] Update README, progress log, next-action handoff, and PR description.
-- [ ] Verify latest GitHub Actions run and fix any failures.
+- [ ] Verify the latest GitHub Actions run for the expiry-test commit and fix any failures.
 
 ## Phase 1 blocker
 - [ ] Select, implement, and configure a real email delivery provider behind EmailSender; registration currently fails closed and reset delivery is disabled without a provider.
