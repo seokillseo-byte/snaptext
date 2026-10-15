@@ -38,3 +38,12 @@
 - Known gaps or blockers
 - Decisions made
 - Next action
+
+## 2026-10-15 — Phase 1 token-expiry hardening and documentation
+- Added PostgreSQL-backed integration assertions that expired email-verification tokens and expired password-reset tokens are rejected with the existing generic invalid/expired responses.
+- Added assertions that registration does not return the verification token in its API response.
+- Updated the Phase 1 backlog and next-action handoff to reflect implemented auth middleware, cookie/origin protections, throttling, token-expiry tests, and the still-unselected email provider.
+- Updated README and local development guidance to accurately describe authenticated workspace APIs, the fail-closed email delivery blocker, same-origin reverse-proxy expectations, and the `TRUST_PROXY_HOPS` setting.
+- GitHub Actions validation for the expiry-test commit is pending; do not treat the tests as passing until the workflow completes successfully.
+- Email provider remains a decision required from the owner. The auth throttle remains in-memory and is not suitable for multi-instance deployment; the security review is not complete.
+- PR #1 remains Draft/open. No merge or deployment was performed.
