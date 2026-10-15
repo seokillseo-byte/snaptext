@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { AlertCircle, ArrowRight, CheckCircle2, FileImage, Files, LoaderCircle, ScanText, ShieldCheck, Sparkles, UploadCloud, X } from "lucide-react";
 import "./styles.css";
@@ -45,7 +45,119 @@ function App() {
   const [statusMessage, setStatusMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [result, setResult] = useState<UploadResult | null>(null);
+  const [authUser, setAuthUser] = useState<{ id: string; email: string } | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "register" | "verify">("login");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [verificationToken, setVerificationToken] = useState("");
+  const [authBusy, setAuthBusy] = useState(false);
+  const [authError, setAuthError] = useState("");
+  const [authNotice, setAuthNotice] = useState("");
   const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then(async (response) => {
+        if (!response.ok) return null;
+        const payload = await response.json();
+        return payload?.data?.user ?? null;
+      })
+      .then((user) => setAuthUser(user))
+      .catch(() => setAuthUser(null))
+      .finally(() => setAuthChecked(true));
+  }, []);
+
+  async function submitAuth(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (authBusy) return;
+    setAuthBusy(true);
+    setAuthError("");
+    setAuthNotice("");
+    try {
+      if (authMode === "verify") {
+        await readJson(await fetch("/api/auth/verify-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: verificationToken.trim() })
+        }));
+        setAuthMode("login");
+        setAuthPassword("");
+        setVerificationToken("");
+        setAuthNotice("Email verified. You can now sign in.");
+      } else if (authMode === "register") {
+        await readJson(await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: authEmail, password: authPassword, workspaceName })
+        }));
+        setAuthMode("verify");
+        setAuthPassword("");
+        setAuthNotice("Registration started. Check your email for the one-time verification token.");
+      } else {
+        const payload = await readJson(await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: authEmail, password: authPassword })
+        }));
+        setAuthUser(payload.data.user as { id: string; email: string });
+        setAuthPassword("");
+      }
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : "The request could not be completed.");
+    } finally {
+      setAuthBusy(false);
+    }
+  }
+
+  async function signOut() {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } finally {
+      setAuthUser(null);
+      setResult(null);
+      setStatusMessage("");
+      setErrorMessage("");
+    }
+  }
+
+  if (!authChecked) {
+    return <main className="app-shell auth-shell"><section className="auth-panel"><div className="brand"><span className="brand-mark"><ScanText size={21} /></span><span>SnapText</span></div><p className="auth-muted">Checking your session…</p></section></main>;
+  }
+
+  if (!authUser) {
+    return (
+      <main className="app-shell auth-shell">
+        <header className="topbar">
+          <a className="brand" href="/" aria-label="SnapText home"><span className="brand-mark"><ScanText size={21} /></span><span>SnapText</span></a>
+          <span className="topbar-note">Customer workspace</span>
+        </header>
+        <section className="auth-panel">
+          <div className="eyebrow"><ShieldCheck size={15} /> PRIVATE CUSTOMER WORKSPACE</div>
+          <h1>{authMode === "register" ? "Create your account." : authMode === "verify" ? "Verify your email." : "Welcome back."}</h1>
+          <p className="auth-muted">{authMode === "register" ? "Create a SnapText account and your own isolated workspace." : authMode === "verify" ? "Enter the one-time token sent to your email address." : "Sign in to manage image batches and extracted data."}</p>
+          <form className="auth-form" onSubmit={submitAuth}>
+            {authMode !== "verify" && <>
+              <label>Email address<input type="email" autoComplete="email" value={authEmail} onChange={(event) => setAuthEmail(event.target.value)} required maxLength={320} disabled={authBusy} /></label>
+              <label>Password<input type="password" autoComplete={authMode === "login" ? "current-password" : "new-password"} value={authPassword} onChange={(event) => setAuthPassword(event.target.value)} required minLength={12} maxLength={128} disabled={authBusy} /><small>Use 12–128 characters.</small></label>
+              {authMode === "register" && <label>Workspace name<input value={workspaceName} onChange={(event) => setWorkspaceName(event.target.value)} required minLength={1} maxLength={160} disabled={authBusy} /></label>}
+            </>}
+            {authMode === "verify" && <label>Verification token<input value={verificationToken} onChange={(event) => setVerificationToken(event.target.value)} required minLength={20} maxLength={200} autoComplete="one-time-code" disabled={authBusy} /></label>}
+            <button className="primary-action auth-submit" type="submit" disabled={authBusy}>{authBusy ? "Please wait…" : authMode === "register" ? "Create account" : authMode === "verify" ? "Verify email" : "Sign in"} <ArrowRight size={16} /></button>
+          </form>
+          {authNotice && <p className="status-message" role="status">{authNotice}</p>}
+          {authError && <p className="error-message" role="alert">{authError}</p>}
+          <div className="auth-links">
+            {authMode === "login" && <button type="button" onClick={() => { setAuthMode("register"); setAuthError(""); setAuthNotice(""); }}>Create an account</button>}
+            {authMode === "register" && <button type="button" onClick={() => { setAuthMode("login"); setAuthError(""); setAuthNotice(""); }}>Already have an account? Sign in</button>}
+            {authMode !== "verify" && <button type="button" onClick={() => { setAuthMode("verify"); setAuthError(""); setAuthNotice(""); }}>Verify email with a token</button>}
+            {authMode === "verify" && <button type="button" onClick={() => { setAuthMode("login"); setAuthError(""); setAuthNotice(""); }}>Back to sign in</button>}
+          </div>
+          <p className="auth-footnote">Your workspace is private to your account. Email delivery must be configured by the service operator before registration can complete.</p>
+        </section>
+      </main>
+    );
+  }
 
   function chooseFiles(nextFiles: FileList | null) {
     if (!nextFiles) return;
@@ -129,7 +241,7 @@ function App() {
           <span className="brand-mark"><ScanText size={21} /></span>
           <span>SnapText</span>
         </a>
-        <span className="topbar-note"><span className="status-dot" /> Development workspace</span>
+        <div className="topbar-note"><span className="status-dot" /> {authUser.email} <button className="signout-button" type="button" onClick={signOut}>Sign out</button></div>
       </header>
 
       <section className="hero">
