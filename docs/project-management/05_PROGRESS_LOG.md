@@ -47,3 +47,5 @@
 - GitHub Actions validation for the expiry-test commit is pending; do not treat the tests as passing until the workflow completes successfully.
 - Email provider remains a decision required from the owner. The auth throttle remains in-memory and is not suitable for multi-instance deployment; the security review is not complete.
 - PR #1 remains Draft/open. No merge or deployment was performed.
+
+- CI run 248 exposed a fixture issue: the migration requires token expiry to occur after token creation, so expired fixtures must backdate `created_at`. Updated both expired-token inserts to satisfy the database constraint; run 249 for commit 5cbef8406abc1fa1402b0aa7300c29b9fc3d563d is pending.
