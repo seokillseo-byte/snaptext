@@ -58,13 +58,31 @@ export function requireSameOrigin(request: Request, response: Response, next: Ne
     return;
   }
   const origin = request.get("origin");
+  const cookieHeader = request.headers.cookie ?? "";
+  const hasSessionCookie = cookieHeader.split(";").some((part) => part.trim().startsWith("snaptext_session="));
+  // Browsers attach cookies automatically. For cookie-authenticated state changes,
+  // require an Origin header so a cross-site form cannot bypass the origin check.
+  // Requests without a session cookie retain compatibility with non-browser API clients.
   if (!origin) {
+    if (hasSessionCookie) {
+      response.status(403).json({ error: { code: "ORIGIN_REQUIRED", message: "An Origin header is required for cookie-authenticated state changes." } });
+      return;
+    }
     next();
     return;
   }
   const host = request.get("host");
   const expected = host ? `${request.protocol}://${host}` : "";
-  if (!expected || origin !== expected) {
+  let suppliedOrigin: string;
+  let expectedOrigin: string;
+  try {
+    suppliedOrigin = new URL(origin).origin;
+    expectedOrigin = new URL(expected).origin;
+  } catch {
+    response.status(403).json({ error: { code: "CROSS_ORIGIN_REQUEST", message: "Cross-origin state changes are not allowed." } });
+    return;
+  }
+  if (!expected || suppliedOrigin !== expectedOrigin) {
     response.status(403).json({ error: { code: "CROSS_ORIGIN_REQUEST", message: "Cross-origin state changes are not allowed." } });
     return;
   }
