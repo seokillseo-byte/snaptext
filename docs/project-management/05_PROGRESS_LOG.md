@@ -86,3 +86,9 @@
 - Added `apps/api/src/authenticationOrigin.test.ts` covering same-origin success, missing Origin with session cookie, hostile origin suffix, malformed origin, GET exemption, and non-cookie API compatibility.
 - CI has been triggered by the new commits; do not consider this slice validated until test/typecheck/build complete successfully. No local test run was performed.
 - Follow-up remains: audit the entire workspace/batch/image path for tenant scoping and add cross-tenant read/write regression coverage; verify trusted proxy behavior in deployment config. PR #3 remains Draft/open; no merge/deployment.
+
+
+## 2026-10-16 — Cross-tenant batch regression coverage (CI pending)
+- Expanded `apps/api/src/auth.integration.test.ts` so user A is explicitly denied listing or reading batches under user B's workspace, while user B can create the fixture batch. Existing checks also deny user A reading user B's workspace or creating a batch there.
+- This improves integration coverage for workspace membership enforcement. Image-level cross-tenant regression coverage remains to be added after this CI run.
+- CI has been triggered by the commit; do not mark this change validated until the database-backed test, typecheck, and build jobs pass. No merge/deployment.
