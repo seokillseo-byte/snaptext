@@ -15,7 +15,7 @@ SnapText is a customer-facing SaaS: self-service signup, monthly/yearly subscrip
 1. Inspect how Express derives protocol/host behind the configured trusted proxy and how the frontend calls state-changing endpoints.
 2. Implemented a focused policy: state-changing requests carrying the `snaptext_session` cookie require a valid matching Origin; malformed/mismatched Origin is rejected; safe methods are exempt; no-cookie API clients may omit Origin. Validate this behavior in CI and against actual proxy/frontend behavior.
 3. Audit workspace/batch/image read and write queries for workspace scoping, and add regression tests for cross-tenant access.
-4. Keep this in a separate draft PR; no merge or deployment until tests and security review pass.
+4. Added database-backed regression checks for cross-tenant batch list/read and foreign-workspace batch creation. Next add image-level cross-tenant read/list/upload checks and run CI; do not merge or deploy until tests and security review pass.
 
 ## Decisions deliberately not invented
 - Email provider: Resend selected and adapter implemented. API key and sender identity are runtime configuration, not source-code values.
