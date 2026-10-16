@@ -25,7 +25,7 @@ test("workspace batch upload validates actual file content and flags duplicates"
   const testSession = await createTestSession(pool);
   const api = {
     get: (url: string) => request(app).get(url).set("Cookie", testSession.cookie),
-    post: (url: string) => request(app).post(url).set("Origin", "http://127.0.0.1").set("Cookie", testSession.cookie)
+    post: (url: string) => request(app).post(url).set("Host", "app.example.test").set("Origin", "http://app.example.test").set("Cookie", testSession.cookie)
   };
   const storage = new LocalImageStorage();
   let workspaceId: string | undefined;
