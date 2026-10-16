@@ -13,7 +13,7 @@ SnapText is a customer-facing SaaS: self-service signup, monthly/yearly subscrip
 
 ## Next code-review slice — CSRF/origin and tenant isolation
 1. Inspect how Express derives protocol/host behind the configured trusted proxy and how the frontend calls state-changing endpoints.
-2. Decide and test the intended behavior when `Origin` is missing or malformed; avoid breaking legitimate non-browser clients without an explicit API policy.
+2. Implemented a focused policy: state-changing requests carrying the `snaptext_session` cookie require a valid matching Origin; malformed/mismatched Origin is rejected; safe methods are exempt; no-cookie API clients may omit Origin. Validate this behavior in CI and against actual proxy/frontend behavior.
 3. Audit workspace/batch/image read and write queries for workspace scoping, and add regression tests for cross-tenant access.
 4. Keep this in a separate draft PR; no merge or deployment until tests and security review pass.
 
