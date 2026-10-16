@@ -68,3 +68,13 @@
 - No Resend API key or live recipient was added to source control. A real delivery test cannot be performed until the owner configures runtime secrets and chooses a controlled inbox.
 - CI validation for the latest smoke-test/docs commits is pending; check the latest run before considering the work fully validated. No local test run was performed.
 - PR #1 remains Draft/open; no merge or deployment was performed.
+
+
+## 2026-10-16 — Auth rate-limiter memory hardening
+- Created draft PR #3 from `hardening/auth-rate-limit-memory` targeting `foundation/project-bootstrap`: https://github.com/seokillseo-byte/snaptext/pull/3.
+- Extracted the process-local authentication rate limiter into `apps/api/src/middleware/authRateLimit.ts`; preserved the 15-minute window, 10-attempt threshold, and existing 429 response contract.
+- Added periodic pruning of expired entries and a hard cap of 10,000 keys with oldest-entry eviction to bound memory growth under high-cardinality IP traffic.
+- Added deterministic tests for threshold enforcement, expiry pruning, and maximum map size in `apps/api/src/authRateLimit.test.ts`.
+- GitHub Actions run 287 passed the `Install, migrate, test, typecheck, build` job: https://github.com/seokillseo-byte/snaptext/actions/runs/38881211758. The user also confirmed the green CI/PR state with screenshots.
+- This remains process-local; it is not suitable as a distributed limiter for multi-instance deployments. No secrets, merge, or deployment were performed. PR #3 remains Draft/open.
+- Next: review and test same-origin/CSRF policy and cross-tenant query scoping; keep email live-delivery and shared throttling as release blockers.
