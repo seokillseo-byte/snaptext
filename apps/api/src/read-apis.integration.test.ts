@@ -23,7 +23,7 @@ test("workspace, batch, and image read endpoints paginate persisted records and 
   const testSession = await createTestSession(pool);
   const api = {
     get: (url: string) => request(app).get(url).set("Cookie", testSession.cookie),
-    post: (url: string) => request(app).post(url).set("Cookie", testSession.cookie)
+    post: (url: string) => request(app).post(url).set("Origin", "http://127.0.0.1").set("Cookie", testSession.cookie)
   };
   const storage = new LocalImageStorage();
   const workspaceIds: string[] = [];
