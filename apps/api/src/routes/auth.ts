@@ -1,30 +1,11 @@
 import { Router } from "express";
 import { getPool } from "../db/pool.js";
 import { requireAuthentication } from "../middleware/authentication.js";
+import { authRateLimit as rateLimit } from "../middleware/authRateLimit.js";
 import { AuthService } from "../services/authService.js";
 
 export const authRouter = Router();
 const service = () => new AuthService(getPool());
-const WINDOW_MS = 15 * 60 * 1000;
-const MAX_ATTEMPTS = 10;
-const attempts = new Map<string, { count: number; expiresAt: number }>();
-
-function rateLimit(request: import("express").Request, response: import("express").Response, next: import("express").NextFunction): void {
-  const key = `${request.ip}:${request.path}`;
-  const now = Date.now();
-  const current = attempts.get(key);
-  if (!current || current.expiresAt <= now) {
-    attempts.set(key, { count: 1, expiresAt: now + WINDOW_MS });
-    next();
-    return;
-  }
-  current.count += 1;
-  if (current.count > MAX_ATTEMPTS) {
-    response.status(429).json({ error: { code: "RATE_LIMITED", message: "Too many attempts. Please try again later." } });
-    return;
-  }
-  next();
-}
 
 function sessionCookie(token: string, expiresAt: Date): string {
   const maxAge = Math.max(0, Math.floor((expiresAt.getTime() - Date.now()) / 1000));
