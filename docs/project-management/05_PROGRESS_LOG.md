@@ -78,3 +78,11 @@
 - GitHub Actions run 287 passed the `Install, migrate, test, typecheck, build` job: https://github.com/seokillseo-byte/snaptext/actions/runs/38881211758. The user also confirmed the green CI/PR state with screenshots.
 - This remains process-local; it is not suitable as a distributed limiter for multi-instance deployments. No secrets, merge, or deployment were performed. PR #3 remains Draft/open.
 - Next: review and test same-origin/CSRF policy and cross-tenant query scoping; keep email live-delivery and shared throttling as release blockers.
+
+
+## 2026-10-16 — Origin/CSRF guard hardening (CI pending)
+- Reviewed `requireSameOrigin` and found state-changing requests with a session cookie were allowed when the Origin header was missing.
+- Updated the guard to require Origin for cookie-authenticated state-changing requests, normalize/parse origins with the URL parser, reject malformed or mismatched origins, and retain compatibility for requests without a session cookie. Safe methods remain exempt.
+- Added `apps/api/src/authenticationOrigin.test.ts` covering same-origin success, missing Origin with session cookie, hostile origin suffix, malformed origin, GET exemption, and non-cookie API compatibility.
+- CI has been triggered by the new commits; do not consider this slice validated until test/typecheck/build complete successfully. No local test run was performed.
+- Follow-up remains: audit the entire workspace/batch/image path for tenant scoping and add cross-tenant read/write regression coverage; verify trusted proxy behavior in deployment config. PR #3 remains Draft/open; no merge/deployment.
