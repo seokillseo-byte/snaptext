@@ -25,7 +25,7 @@ test("workspace batch upload validates actual file content and flags duplicates"
   const testSession = await createTestSession(pool);
   const api = {
     get: (url: string) => request(app).get(url).set("Cookie", testSession.cookie),
-    post: (url: string) => request(app).post(url).set("Cookie", testSession.cookie)
+    post: (url: string) => request(app).post(url).set("Host", "app.example.test").set("Origin", "http://app.example.test").set("Cookie", testSession.cookie)
   };
   const storage = new LocalImageStorage();
   let workspaceId: string | undefined;
@@ -84,7 +84,7 @@ test("combined upload limit returns 413 and removes temporary files", {
   const testSession = await createTestSession(pool);
   const api = {
     get: (url: string) => request(app).get(url).set("Cookie", testSession.cookie),
-    post: (url: string) => request(app).post(url).set("Cookie", testSession.cookie)
+    post: (url: string) => request(app).post(url).set("Host", "app.example.test").set("Origin", "http://app.example.test").set("Cookie", testSession.cookie)
   };
   const tempRoot = path.resolve(process.env.UPLOAD_TEMP_ROOT ?? path.resolve(process.cwd(), ".snaptext-data/tmp"));
   let workspaceId: string | undefined;

@@ -72,7 +72,7 @@ test("self-service registration requires verification and supports session login
     assert.equal(workspaces.body.data.items.length, 1);
     assert.equal(workspaces.body.data.items[0].name, "Test customer workspace");
 
-    const logout = await request(app).post("/api/auth/logout").set("Cookie", cookie);
+    const logout = await request(app).post("/api/auth/logout").set("Cookie", cookie).set("Host", "app.example.test").set("Origin", "http://app.example.test");
     assert.equal(logout.status, 204);
     const afterLogout = await request(app).get("/api/auth/me").set("Cookie", cookie);
     assert.equal(afterLogout.status, 401);
@@ -129,12 +129,12 @@ test("workspace APIs deny cross-tenant reads and writes", {
   let workspaceB: string | undefined;
   try {
     const createA = await request(app).post("/api/workspaces")
-      .set("Cookie", userA.cookie).send({ name: "Tenant A" });
+      .set("Host", "app.example.test").set("Origin", "http://app.example.test").set("Cookie", userA.cookie).send({ name: "Tenant A" });
     assert.equal(createA.status, 201);
     workspaceA = createA.body.data.id;
 
     const createB = await request(app).post("/api/workspaces")
-      .set("Cookie", userB.cookie).send({ name: "Tenant B" });
+      .set("Host", "app.example.test").set("Origin", "http://app.example.test").set("Cookie", userB.cookie).send({ name: "Tenant B" });
     assert.equal(createB.status, 201);
     workspaceB = createB.body.data.id;
 
@@ -143,8 +143,28 @@ test("workspace APIs deny cross-tenant reads and writes", {
 
     const createBatchInBAsA = await request(app)
       .post(`/api/workspaces/${workspaceB}/batches`)
-      .set("Cookie", userA.cookie).send({ name: "Unauthorized batch" });
+      .set("Host", "app.example.test").set("Origin", "http://app.example.test").set("Cookie", userA.cookie).send({ name: "Unauthorized batch" });
     assert.equal(createBatchInBAsA.status, 404);
+
+    const createBatchInBAsB = await request(app)
+      .post(`/api/workspaces/${workspaceB}/batches`)
+      .set("Host", "app.example.test").set("Origin", "http://app.example.test").set("Cookie", userB.cookie).send({ name: "Tenant B private batch" });
+    assert.equal(createBatchInBAsB.status, 201);
+    const batchB = createBatchInBAsB.body.data.id as string;
+
+    const listBatchesAsA = await request(app)
+      .get(`/api/workspaces/${workspaceB}/batches`).set("Cookie", userA.cookie);
+    assert.equal(listBatchesAsA.status, 404);
+
+    const readBatchBAsA = await request(app)
+      .get(`/api/workspaces/${workspaceB}/batches/${batchB}`).set("Cookie", userA.cookie);
+    assert.equal(readBatchBAsA.status, 404);
+
+    const createBatchUsingForeignWorkspaceAsA = await request(app)
+      .post(`/api/workspaces/${workspaceB}/batches`)
+      .set("Host", "app.example.test").set("Origin", "http://app.example.test")
+      .set("Cookie", userA.cookie).send({ name: "Cross-tenant write attempt" });
+    assert.equal(createBatchUsingForeignWorkspaceAsA.status, 404);
 
     const listAsA = await request(app).get("/api/workspaces").set("Cookie", userA.cookie);
     assert.equal(listAsA.status, 200);

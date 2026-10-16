@@ -20,7 +20,12 @@
 - [x] Add integration tests for password-reset replay, session expiry, registration/verification, login/logout, and cross-tenant workspace access.
 - [x] Add integration tests proving expired password-reset and email-verification tokens are rejected; review audit/error behavior further before release.
 - [x] Update README, progress log, next-action handoff, and PR description.
-- [ ] Verify the latest GitHub Actions run for Resend integration and expiry-test changes; fix any failures.
+- [x] Verify latest GitHub Actions run for Resend integration and expiry-test changes; run 287 passed.
+- [x] Bound process-local auth rate-limiter memory with periodic expiry pruning and a hard entry cap; add deterministic unit tests (PR #3, CI run 287 passed).
+- [ ] Validate the new cookie-authenticated Origin requirement with CI and reverse-proxy configuration tests.
+- [ ] Add cross-tenant image read/list/upload regression tests; run CI and verify all cross-tenant batch tests pass.
+- [ ] Audit remaining workspace/batch/image repository queries and trusted-proxy Origin behavior.
+- [ ] Replace process-local throttling with shared storage before multi-instance production deployment.
 
 ## Phase 1 email delivery status
 - [x] Implement Resend HTTPS email adapter behind EmailSender using `RESEND_API_KEY` and `RESEND_FROM_EMAIL`; no API key is stored in the repository.

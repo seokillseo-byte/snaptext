@@ -68,3 +68,27 @@
 - No Resend API key or live recipient was added to source control. A real delivery test cannot be performed until the owner configures runtime secrets and chooses a controlled inbox.
 - CI validation for the latest smoke-test/docs commits is pending; check the latest run before considering the work fully validated. No local test run was performed.
 - PR #1 remains Draft/open; no merge or deployment was performed.
+
+
+## 2026-10-16 — Auth rate-limiter memory hardening
+- Created draft PR #3 from `hardening/auth-rate-limit-memory` targeting `foundation/project-bootstrap`: https://github.com/seokillseo-byte/snaptext/pull/3.
+- Extracted the process-local authentication rate limiter into `apps/api/src/middleware/authRateLimit.ts`; preserved the 15-minute window, 10-attempt threshold, and existing 429 response contract.
+- Added periodic pruning of expired entries and a hard cap of 10,000 keys with oldest-entry eviction to bound memory growth under high-cardinality IP traffic.
+- Added deterministic tests for threshold enforcement, expiry pruning, and maximum map size in `apps/api/src/authRateLimit.test.ts`.
+- GitHub Actions run 287 passed the `Install, migrate, test, typecheck, build` job: https://github.com/seokillseo-byte/snaptext/actions/runs/38881211758. The user also confirmed the green CI/PR state with screenshots.
+- This remains process-local; it is not suitable as a distributed limiter for multi-instance deployments. No secrets, merge, or deployment were performed. PR #3 remains Draft/open.
+- Next: review and test same-origin/CSRF policy and cross-tenant query scoping; keep email live-delivery and shared throttling as release blockers.
+
+
+## 2026-10-16 — Origin/CSRF guard hardening (CI pending)
+- Reviewed `requireSameOrigin` and found state-changing requests with a session cookie were allowed when the Origin header was missing.
+- Updated the guard to require Origin for cookie-authenticated state-changing requests, normalize/parse origins with the URL parser, reject malformed or mismatched origins, and retain compatibility for requests without a session cookie. Safe methods remain exempt.
+- Added `apps/api/src/authenticationOrigin.test.ts` covering same-origin success, missing Origin with session cookie, hostile origin suffix, malformed origin, GET exemption, and non-cookie API compatibility.
+- CI has been triggered by the new commits; do not consider this slice validated until test/typecheck/build complete successfully. No local test run was performed.
+- Follow-up remains: audit the entire workspace/batch/image path for tenant scoping and add cross-tenant read/write regression coverage; verify trusted proxy behavior in deployment config. PR #3 remains Draft/open; no merge/deployment.
+
+
+## 2026-10-16 — Cross-tenant batch regression coverage (CI pending)
+- Expanded `apps/api/src/auth.integration.test.ts` so user A is explicitly denied listing or reading batches under user B's workspace, while user B can create the fixture batch. Existing checks also deny user A reading user B's workspace or creating a batch there.
+- This improves integration coverage for workspace membership enforcement. Image-level cross-tenant regression coverage remains to be added after this CI run.
+- CI has been triggered by the commit; do not mark this change validated until the database-backed test, typecheck, and build jobs pass. No merge/deployment.
