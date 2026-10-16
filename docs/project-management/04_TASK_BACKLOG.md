@@ -23,7 +23,8 @@
 - [x] Verify latest GitHub Actions run for Resend integration and expiry-test changes; run 287 passed.
 - [x] Bound process-local auth rate-limiter memory with periodic expiry pruning and a hard entry cap; add deterministic unit tests (PR #3, CI run 287 passed).
 - [ ] Validate the new cookie-authenticated Origin requirement with CI and reverse-proxy configuration tests.
-- [ ] Audit workspace/batch/image query scoping and test cross-tenant read/write denial comprehensively.
+- [ ] Add cross-tenant image read/list/upload regression tests; run CI and verify all cross-tenant batch tests pass.
+- [ ] Audit remaining workspace/batch/image repository queries and trusted-proxy Origin behavior.
 - [ ] Replace process-local throttling with shared storage before multi-instance production deployment.
 
 ## Phase 1 email delivery status
