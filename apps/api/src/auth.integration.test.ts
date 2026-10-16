@@ -72,7 +72,7 @@ test("self-service registration requires verification and supports session login
     assert.equal(workspaces.body.data.items.length, 1);
     assert.equal(workspaces.body.data.items[0].name, "Test customer workspace");
 
-    const logout = await request(app).post("/api/auth/logout").set("Cookie", cookie).set("Origin", "http://127.0.0.1");
+    const logout = await request(app).post("/api/auth/logout").set("Cookie", cookie).set("Host", "app.example.test").set("Origin", "http://app.example.test");
     assert.equal(logout.status, 204);
     const afterLogout = await request(app).get("/api/auth/me").set("Cookie", cookie);
     assert.equal(afterLogout.status, 401);
@@ -129,12 +129,12 @@ test("workspace APIs deny cross-tenant reads and writes", {
   let workspaceB: string | undefined;
   try {
     const createA = await request(app).post("/api/workspaces")
-      .set("Origin", "http://127.0.0.1").set("Cookie", userA.cookie).send({ name: "Tenant A" });
+      .set("Host", "app.example.test").set("Origin", "http://app.example.test").set("Cookie", userA.cookie).send({ name: "Tenant A" });
     assert.equal(createA.status, 201);
     workspaceA = createA.body.data.id;
 
     const createB = await request(app).post("/api/workspaces")
-      .set("Origin", "http://127.0.0.1").set("Cookie", userB.cookie).send({ name: "Tenant B" });
+      .set("Host", "app.example.test").set("Origin", "http://app.example.test").set("Cookie", userB.cookie).send({ name: "Tenant B" });
     assert.equal(createB.status, 201);
     workspaceB = createB.body.data.id;
 
@@ -143,7 +143,7 @@ test("workspace APIs deny cross-tenant reads and writes", {
 
     const createBatchInBAsA = await request(app)
       .post(`/api/workspaces/${workspaceB}/batches`)
-      .set("Origin", "http://127.0.0.1").set("Cookie", userA.cookie).send({ name: "Unauthorized batch" });
+      .set("Host", "app.example.test").set("Origin", "http://app.example.test").set("Cookie", userA.cookie).send({ name: "Unauthorized batch" });
     assert.equal(createBatchInBAsA.status, 404);
 
     const listAsA = await request(app).get("/api/workspaces").set("Cookie", userA.cookie);
