@@ -53,6 +53,8 @@ jobs:
         run: npm run db:migrate && npm run db:migrate
       - name: Run API tests
         run: npm test
+      - name: Run OCR benchmark scorer tests
+        run: node --test scripts/ocr-benchmark/score.test.mjs
       - name: Typecheck
         run: npm run typecheck
       - name: Build
