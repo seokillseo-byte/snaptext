@@ -8,6 +8,6 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 
 test("validates the checked-in synthetic bilingual fixture manifest", async () => {
   const result = await validateManifest(path.join(here, "manifest.example.json"));
-  assert.equal(result.fixtureCount, 4);
-  assert.deepEqual(result.ids, ["vi-clean-001", "vi-low-contrast-001", "en-clean-001", "en-multiline-001"]);
+  assert.equal(result.fixtureCount, 8);
+  assert.deepEqual(result.ids, ["vi-clean-001", "vi-low-contrast-001", "en-clean-001", "en-multiline-001", "vi-rotated-001", "en-blurred-001", "vi-serif-001", "en-small-text-001"]);
 });
