@@ -39,14 +39,14 @@ Select the default only after results are available. Weight field-level correctn
 
 ## Current fixture pack and status
 
-A small deterministic smoke-test pack now lives under `scripts/ocr-benchmark/fixtures/` with four synthetic SVG source images covering Vietnamese clean text, Vietnamese low contrast, English clean invoice-like text, and English multi-line text. Ground truth and field labels are recorded in `scripts/ocr-benchmark/manifest.example.json`. CI validates fixture IDs, metadata, safe relative paths, and file existence.
+A deterministic smoke-test pack now lives under `scripts/ocr-benchmark/fixtures/` with eight synthetic SVG source images covering Vietnamese clean text, low contrast, rotated text, serif font; and English clean invoice-like text, multi-line text, blur, and small text. Ground truth and field labels are recorded in `scripts/ocr-benchmark/manifest.example.json`. CI validates fixture IDs, metadata, safe relative paths, and file existence.
 
-These are SVG source fixtures, not yet raster OCR inputs. Before any engine comparison, rasterize them to lossless PNG/TIFF with pinned settings and record rasterizer/version and image hashes. The current scorer only scores supplied predictions; it does not invoke PaddleOCR or Tesseract. This four-item pack is a smoke-test starter, not enough to select a production default. Expand it with varied fonts, rotations, blur, phone-photo perspective, and multiple layouts before drawing conclusions.
+These are SVG source fixtures, not yet raster OCR inputs. Before any engine comparison, rasterize them to lossless PNG/TIFF with pinned settings and record rasterizer/version and image hashes. The current scorer only scores supplied predictions; it does not invoke PaddleOCR or Tesseract. It reports aggregate and per-language/per-scenario summaries, and the CLI now rejects duplicate prediction IDs rather than silently overwriting them. This four-item pack is a smoke-test starter, not enough to select a production default. Expand it with varied fonts, rotations, blur, phone-photo perspective, and multiple layouts before drawing conclusions.
 
 ## Next implementation steps
 
-1. Add a small licensed/synthetic fixture set and ground-truth manifest.
-2. Add a runner that produces CER, WER, field accuracy, and latency summaries.
-3. Run both engines in a documented environment.
-4. Review the result before selecting the default engine.
-5. Add deterministic mocked OCR tests to CI; do not require external model downloads or AI-provider credentials in ordinary CI.
+1. Rasterize the SVG source fixtures to PNG/TIFF with a pinned toolchain and record image hashes.
+2. Implement isolated PaddleOCR and Tesseract runner adapters with pinned versions/configuration and explicit error accounting.
+3. Run both engines in a documented environment and feed predictions into the scorer.
+4. Expand the dataset beyond this eight-case smoke test before comparing production suitability.
+5. Review results before selecting a default engine. Keep model downloads and hardware-dependent runs out of ordinary CI; CI should test adapters with deterministic mocks.
