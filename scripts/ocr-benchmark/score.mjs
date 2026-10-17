@@ -35,11 +35,27 @@ function errorRate(reference, hypothesis, tokenize) {
 }
 
 export function scoreFixture(fixture, prediction) {
+  const failed = prediction.error != null;
+  const expectedFields = fixture.groundTruthFields ?? {};
+  const fieldEntries = Object.entries(expectedFields);
+  // Failed engine runs have no meaningful OCR accuracy. Keep those metrics null
+  // instead of reporting an artificial 100% error rate from an empty string.
+  if (failed) {
+    return {
+      id: fixture.id,
+      cer: null,
+      wer: null,
+      fieldAccuracy: null,
+      matchedFields: 0,
+      totalFields: fieldEntries.length,
+      failed: true,
+      latencyMs: Number.isFinite(prediction.latencyMs) ? prediction.latencyMs : null
+    };
+  }
+
   const referenceText = normalize(fixture.groundTruthText);
   const predictedText = normalize(prediction.text);
-  const expectedFields = fixture.groundTruthFields ?? {};
   const predictedFields = prediction.fields ?? {};
-  const fieldEntries = Object.entries(expectedFields);
   const matchedFields = fieldEntries.filter(([key, value]) =>
     normalize(predictedFields[key]) === normalize(value)
   ).length;
@@ -51,7 +67,7 @@ export function scoreFixture(fixture, prediction) {
     fieldAccuracy: fieldEntries.length ? matchedFields / fieldEntries.length : null,
     matchedFields,
     totalFields: fieldEntries.length,
-    failed: prediction.error != null,
+    failed: false,
     latencyMs: Number.isFinite(prediction.latencyMs) ? prediction.latencyMs : null
   };
 }

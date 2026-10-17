@@ -62,3 +62,20 @@ test("normalizes decomposed Vietnamese city names including circumflex and dot-b
   assert.equal(score.wer, 0);
   assert.equal(score.fieldAccuracy, 1);
 });
+
+
+test("failed OCR predictions do not masquerade as accuracy scores", () => {
+  const score = scoreFixture(
+    { id: "failed-1", groundTruthText: "Invoice 123", groundTruthFields: { invoiceNumber: "123" } },
+    { text: "", fields: {}, error: { code: "ENGINE_FAILED" }, latencyMs: 12 }
+  );
+  assert.equal(score.failed, true);
+  assert.equal(score.cer, null);
+  assert.equal(score.wer, null);
+  assert.equal(score.fieldAccuracy, null);
+  assert.equal(score.latencyMs, 12);
+  const summary = summarize([score]);
+  assert.equal(summary.failureRate, 1);
+  assert.equal(summary.meanCer, null);
+  assert.equal(summary.meanFieldAccuracy, null);
+});
