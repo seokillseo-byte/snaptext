@@ -41,12 +41,12 @@ Select the default only after results are available. Weight field-level correctn
 
 A deterministic smoke-test pack now lives under `scripts/ocr-benchmark/fixtures/` with eight synthetic SVG source images covering Vietnamese clean text, low contrast, rotated text, serif font; and English clean invoice-like text, multi-line text, blur, and small text. Ground truth and field labels are recorded in `scripts/ocr-benchmark/manifest.example.json`. CI validates fixture IDs, metadata, safe relative paths, and file existence.
 
-These are SVG source fixtures, not yet raster OCR inputs. Before any engine comparison, rasterize them to lossless PNG/TIFF with pinned settings and record rasterizer/version and image hashes. The current scorer only scores supplied predictions; it does not invoke PaddleOCR or Tesseract. It reports aggregate and per-language/per-scenario summaries, and the CLI now rejects duplicate prediction IDs rather than silently overwriting them. This four-item pack is a smoke-test starter, not enough to select a production default. Expand it with varied fonts, rotations, blur, phone-photo perspective, and multiple layouts before drawing conclusions.
+These are SVG source fixtures. The pinned rasterizer in `scripts/ocr-benchmark/rasterize.py` converts them to lossless PNGs and emits source/output SHA-256 hashes plus tool versions in a generated provenance manifest. CI uploads the generated PNGs and manifest as a short-lived artifact. The scorer reports aggregate and per-language/per-scenario summaries and rejects duplicate prediction IDs. The separate engine adapters can invoke Tesseract TSV and an optional PaddleOCR Python bridge; CI tests parsing and failure handling with fakes, not real engine inference. This eight-case pack is a smoke-test starter, not enough to select a production default. Expand it with varied fonts, rotations, blur, phone-photo perspective, and multiple layouts before drawing conclusions.
 
 ## Next implementation steps
 
-1. Rasterize the SVG source fixtures to PNG/TIFF with a pinned toolchain and record image hashes.
-2. Implement isolated PaddleOCR and Tesseract runner adapters with pinned versions/configuration and explicit error accounting.
-3. Run both engines in a documented environment and feed predictions into the scorer.
-4. Expand the dataset beyond this eight-case smoke test before comparing production suitability.
+1. Expand the synthetic fixture set beyond eight cases, especially phone-photo perspective, mixed fonts, skew, and structured field layouts.
+2. Add a field-extraction stage so field accuracy measures extracted values rather than empty adapter fields.
+3. Install both real engines in a documented, pinned local/benchmark environment and run the exact same rasterized fixtures; include warm-up plus at least three timed passes.
+4. Preserve raw predictions and all per-fixture failures, then compare CER/WER, field accuracy, median/p95 latency, and failure rate by language/scenario.
 5. Review results before selecting a default engine. Keep model downloads and hardware-dependent runs out of ordinary CI; CI should test adapters with deterministic mocks.
