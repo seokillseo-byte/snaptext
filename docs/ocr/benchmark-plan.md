@@ -14,39 +14,30 @@ Choose SnapText's default local OCR engine from repeatable measurements for the 
 
 ## Metrics
 
-For every engine/version/configuration, record:
-
-1. Character error rate (CER) = character edit distance / ground-truth character count.
-2. Word error rate (WER) = word edit distance / ground-truth word count.
-3. Field-level exact-match accuracy for fields extracted from the OCR output.
-4. Median and p95 processing latency per image, plus throughput.
-5. Failure rate, runtime environment, model download requirements, and approximate resource use.
-
-Normalize Unicode consistently for scoring (document the chosen normalization), but retain original OCR output for inspection. Report results separately by language and scenario, not only as one aggregate.
+For every engine/version/configuration, record CER, WER, field-level exact-match accuracy, median/p95 processing latency per image, throughput, failure rate, runtime environment, model requirements, and approximate resource use. Normalize Unicode consistently for scoring, but retain original OCR output. Report results by language and scenario as well as aggregate.
 
 ## Reproducibility
 
 - Pin engine/package versions and document OS, runtime, CPU/GPU, and model configuration.
 - Run both engines on the exact same fixture set and preprocessing policy.
-- Keep raw predictions and a machine-readable score summary as generated artifacts; avoid committing bulky model weights.
-- Run at least three timed passes after warm-up. Report median and p95 rather than a single timing.
+- Keep raw predictions and machine-readable score summaries as generated artifacts; avoid committing bulky model weights.
+- Perform one warm-up per fixture, then at least three timed passes. Report median and p95 latency.
 - Inspect representative errors manually and note whether errors change extracted field meaning.
 - A benchmark result is invalid if either engine silently skips failed fixtures; failures must be counted.
 
-## Decision rule
-
-Select the default only after results are available. Weight field-level correctness and uncertainty visibility above raw speed alone. Document trade-offs and keep the OCR engine behind a provider-neutral adapter so the implementation can change without changing the web API.
-
 ## Current fixture pack and status
 
-A deterministic smoke-test pack now lives under `scripts/ocr-benchmark/fixtures/` with ten synthetic SVG source images covering Vietnamese clean text, low contrast, rotated text, serif font; and English clean invoice-like text, multi-line text, blur, and small text. Ground truth and field labels are recorded in `scripts/ocr-benchmark/manifest.example.json`. CI validates fixture IDs, metadata, safe relative paths, and file existence.
+Ten deterministic synthetic SVG fixtures live under `scripts/ocr-benchmark/fixtures/`, with ground truth and regex field rules in `scripts/ocr-benchmark/manifest.example.json`. Scenarios include Vietnamese and English, low contrast, rotation, serif/mixed fonts, blur, small text, multi-line layout, and perspective-like distortion. The pinned rasterizer produces PNGs and source/output SHA-256 provenance. CI uploads generated images and manifests as a short-lived artifact.
 
-These are SVG source fixtures. The pinned rasterizer in `scripts/ocr-benchmark/rasterize.py` converts them to lossless PNGs and emits source/output SHA-256 hashes plus tool versions in a generated provenance manifest. CI uploads the generated PNGs and manifest as a short-lived artifact. The scorer reports aggregate and per-language/per-scenario summaries and rejects duplicate prediction IDs. The separate engine adapters can invoke Tesseract TSV and an optional PaddleOCR Python bridge; CI tests parsing and failure handling with fakes, not real engine inference. This eight-case pack is a smoke-test starter, not enough to select a production default. Expand it with varied fonts, rotations, blur, phone-photo perspective, and multiple layouts before drawing conclusions.
+The engine adapters support Tesseract TSV and an optional PaddleOCR Python bridge. Ordinary CI uses deterministic fakes rather than downloading large models. The repeated-run harness excludes a per-fixture warm-up, runs configurable measured passes (default three), saves scorer-compatible predictions plus a separate raw per-pass log, and reports median/p95 latency and failures. The regex field extractor is a baseline only; inspect field errors rather than treating it as production-grade extraction.
 
-## Next implementation steps
+## Decision rule
 
-1. Continue expanding beyond ten synthetic cases, especially realistic phone photos, varied layouts, and overlapping/occluded text.
-2. Run both real engines in documented, pinned local/benchmark environments on the exact same rasterized fixtures; include warm-up plus at least three timed passes.
-3. Preserve raw predictions and all per-fixture failures; run field extraction as a separate stage and inspect its errors.
-4. Compare CER/WER, field accuracy, median/p95 latency, and failure rate by language/scenario.
-5. Review results before selecting a default engine. Keep model downloads and hardware-dependent runs out of ordinary CI; CI should test adapters with deterministic mocks.
+Select the default only after results are available. Weight field-level correctness and uncertainty visibility above raw speed alone. Keep the OCR engine behind a provider-neutral adapter so the implementation can change without changing the web API.
+
+## Next steps
+
+1. Run both real engines in documented, pinned environments on the same rasterized fixtures; preserve model/configuration versions.
+2. Compare CER/WER, field exact-match accuracy, median/p95 latency, and failure rate by language/scenario.
+3. Expand the smoke-test pack with licensed real-world-like layouts (synthetic or redistributable), then manually inspect extraction errors.
+4. Review evidence before selecting a default engine. Keep model downloads and hardware-dependent runs out of ordinary CI.
