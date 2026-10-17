@@ -110,7 +110,7 @@ async function main() {
   const manifestPath = value("--manifest");
   const outputPath = value("--output");
   if (!["tesseract", "paddleocr"].includes(engine) || !manifestPath || !outputPath) {
-    console.error("Usage: node scripts/ocr-benchmark/engine-runner.mjs --engine tesseract|paddleocr --manifest <raster-manifest.json> --output <predictions.json>");
+    console.error("Usage: node scripts/ocr-benchmark/engine-adapters.mjs --engine tesseract|paddleocr --manifest <raster-manifest.json> --output <predictions.json>");
     process.exitCode = 2;
     return;
   }
@@ -122,17 +122,13 @@ async function main() {
     const imagePath = path.resolve(fixture.image);
     return createPrediction({ ...fixture, image: imagePath }, runner);
   });
-  const result = {
-    schemaVersion: 1, engine,
-    fixtureCount: predictions.length,
-    failureCount: predictions.filter((prediction) => prediction.error).length,
-    predictions
-  };
+  const failureCount = predictions.filter((prediction) => prediction.error).length;
   const target = path.resolve(outputPath);
   await mkdir(path.dirname(target), { recursive: true });
-  await writeFile(target, JSON.stringify(result, null, 2) + "\n", "utf8");
-  console.log(JSON.stringify({ engine, fixtureCount: result.fixtureCount, failureCount: result.failureCount, output: target }, null, 2));
-  if (result.failureCount) process.exitCode = 1;
+  // The scorer consumes a plain predictions array; provider metadata stays per prediction.
+  await writeFile(target, JSON.stringify(predictions, null, 2) + "\n", "utf8");
+  console.log(JSON.stringify({ engine, fixtureCount: predictions.length, failureCount, output: target }, null, 2));
+  if (failureCount) process.exitCode = 1;
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
