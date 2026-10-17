@@ -37,6 +37,12 @@ Normalize Unicode consistently for scoring (document the chosen normalization), 
 
 Select the default only after results are available. Weight field-level correctness and uncertainty visibility above raw speed alone. Document trade-offs and keep the OCR engine behind a provider-neutral adapter so the implementation can change without changing the web API.
 
+## Current fixture pack and status
+
+A small deterministic smoke-test pack now lives under `scripts/ocr-benchmark/fixtures/` with four synthetic SVG source images covering Vietnamese clean text, Vietnamese low contrast, English clean invoice-like text, and English multi-line text. Ground truth and field labels are recorded in `scripts/ocr-benchmark/manifest.example.json`. CI validates fixture IDs, metadata, safe relative paths, and file existence.
+
+These are SVG source fixtures, not yet raster OCR inputs. Before any engine comparison, rasterize them to lossless PNG/TIFF with pinned settings and record rasterizer/version and image hashes. The current scorer only scores supplied predictions; it does not invoke PaddleOCR or Tesseract. This four-item pack is a smoke-test starter, not enough to select a production default. Expand it with varied fonts, rotations, blur, phone-photo perspective, and multiple layouts before drawing conclusions.
+
 ## Next implementation steps
 
 1. Add a small licensed/synthetic fixture set and ground-truth manifest.
