@@ -52,3 +52,13 @@ test("summarizes latency and ignores failed records for accuracy", () => {
   assert.equal(summary.medianLatencyMs, 10);
   assert.equal(summary.p95LatencyMs, 30);
 });
+
+test("normalizes decomposed Vietnamese city names including circumflex and dot-below", () => {
+  const score = scoreFixture(
+    { id: "vi-city", groundTruthText: "Hà Nội", groundTruthFields: { city: "Hà Nội" } },
+    { text: "Ha\\u0300 No\\u0302\\u0323i", fields: { city: "Ha\\u0300 No\\u0302\\u0323i" }, latencyMs: 1 }
+  );
+  assert.equal(score.cer, 0);
+  assert.equal(score.wer, 0);
+  assert.equal(score.fieldAccuracy, 1);
+});
