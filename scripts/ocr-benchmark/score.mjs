@@ -94,25 +94,49 @@ async function main() {
     throw new Error("Manifest must contain a fixtures array; predictions must be an array.");
   }
 
+  const predictionIds = new Set();
+  const duplicatePredictionIds = new Set();
+  for (const prediction of predictions) {
+    if (!prediction || typeof prediction.id !== "string" || !prediction.id.trim()) {
+      throw new Error("Every prediction must have a non-empty string id.");
+    }
+    if (predictionIds.has(prediction.id)) duplicatePredictionIds.add(prediction.id);
+    predictionIds.add(prediction.id);
+  }
   const byId = new Map(predictions.map((prediction) => [prediction.id, prediction]));
   const scores = manifest.fixtures.map((fixture) => {
     const prediction = byId.get(fixture.id);
     if (!prediction) {
-      return { id: fixture.id, cer: null, wer: null, fieldAccuracy: null, failed: true, latencyMs: null, error: "missing_prediction" };
+      return { id: fixture.id, language: fixture.language, scenario: fixture.scenario ?? [], cer: null, wer: null, fieldAccuracy: null, failed: true, latencyMs: null, error: "missing_prediction" };
     }
-    return scoreFixture(fixture, prediction);
+    return { ...scoreFixture(fixture, prediction), language: fixture.language, scenario: fixture.scenario ?? [] };
   });
+  const fixtureIds = new Set(manifest.fixtures.map((fixture) => fixture.id));
   const extraPredictionIds = predictions.map((prediction) => prediction.id)
-    .filter((id) => !manifest.fixtures.some((fixture) => fixture.id === id));
+    .filter((id) => !fixtureIds.has(id));
+  const groupBy = (key, valueFor) => {
+    const groups = new Map();
+    for (const score of scores) {
+      const value = valueFor(score);
+      const groupKey = Array.isArray(value) ? value.join(", ") : String(value ?? "unknown");
+      if (!groups.has(groupKey)) groups.set(groupKey, []);
+      groups.get(groupKey).push(score);
+    }
+    return Object.fromEntries([...groups.entries()].sort(([a], [b]) => a.localeCompare(b))
+      .map(([name, items]) => [name, summarize(items)]));
+  };
 
   console.log(JSON.stringify({
     schemaVersion: 1,
     normalization: "Unicode NFC; trim and collapse whitespace; word tokens split on whitespace",
     summary: summarize(scores),
+    byLanguage: groupBy("language", (score) => score.language),
+    byScenario: groupBy("scenario", (score) => score.scenario),
     scores,
-    extraPredictionIds
+    extraPredictionIds,
+    duplicatePredictionIds: [...duplicatePredictionIds]
   }, null, 2));
-  if (extraPredictionIds.length) process.exitCode = 1;
+  if (extraPredictionIds.length || duplicatePredictionIds.size) process.exitCode = 1;
 }
 
 if (import.meta.url === new URL(process.argv[1], "file:").href) {
