@@ -63,7 +63,7 @@ jobs:
       - name: Run API tests
         run: npm test
       - name: Run OCR benchmark scorer, adapters, extraction, and repeated-run tests
-        run: node --test scripts/ocr-benchmark/score.test.mjs scripts/ocr-benchmark/score-cli.test.mjs scripts/ocr-benchmark/engine-adapters.test.mjs scripts/ocr-benchmark/extract-fields.test.mjs scripts/ocr-benchmark/benchmark-runner.test.mjs scripts/ocr-benchmark/compare-reports.test.mjs
+        run: node --test scripts/ocr-benchmark/score.test.mjs scripts/ocr-benchmark/score-cli.test.mjs scripts/ocr-benchmark/engine-adapters.test.mjs scripts/ocr-benchmark/extract-fields.test.mjs scripts/ocr-benchmark/benchmark-runner.test.mjs scripts/ocr-benchmark/compare-reports.test.mjs scripts/ocr-benchmark/render-report.test.mjs
       - name: Validate OCR benchmark fixtures
         run: node --test scripts/ocr-benchmark/validate-manifest.test.mjs && node scripts/ocr-benchmark/validate-manifest.mjs
       - name: Rasterize OCR fixtures and record hashes
@@ -86,6 +86,7 @@ jobs:
           node scripts/ocr-benchmark/benchmark-runner.mjs --engine tesseract --manifest artifacts/ocr-benchmark/raster-manifest.json --passes 3 --output artifacts/ocr-benchmark/predictions-tesseract.json --raw-output artifacts/ocr-benchmark/runs-tesseract.json
           node scripts/ocr-benchmark/extract-fields.mjs --manifest scripts/ocr-benchmark/manifest.example.json --predictions artifacts/ocr-benchmark/predictions-tesseract.json --output artifacts/ocr-benchmark/predictions-tesseract-fields.json
           node scripts/ocr-benchmark/score.mjs scripts/ocr-benchmark/manifest.example.json artifacts/ocr-benchmark/predictions-tesseract-fields.json > artifacts/ocr-benchmark/score-tesseract.json
+          node scripts/ocr-benchmark/render-report.mjs --input artifacts/ocr-benchmark/score-tesseract.json --output artifacts/ocr-benchmark/tesseract-report.html --title "SnapText · Tesseract Benchmark"
       - name: Upload real OCR benchmark results
         if: always()
         uses: actions/upload-artifact@v4
