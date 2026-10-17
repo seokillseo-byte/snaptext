@@ -9,7 +9,7 @@ test("scores Vietnamese text after Unicode NFC normalization", () => {
     groundTruthFields: { fullName: "Nguyễn Văn An", city: "Hà Nội" }
   };
   const prediction = {
-    text: "Nguye\u0302n Va\u0306n An Ha\u0300 No\u0323i",
+    text: "Nguye\u0302\u0303n Va\u0306n An Ha\u0300 No\u0323i",
     fields: { fullName: "Nguyễn Văn An", city: "Hà Nội" },
     latencyMs: 20
   };
