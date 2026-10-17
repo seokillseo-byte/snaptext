@@ -10,7 +10,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: snaptext-ci-${{ github.ref }}
+  # Share one concurrency group between push and PR events for the same head branch.
+  group: snaptext-ci-${{ github.event.pull_request.head.ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
