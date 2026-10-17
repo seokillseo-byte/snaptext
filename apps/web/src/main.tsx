@@ -46,7 +46,7 @@ function DemoApp() {
     { file: "form_003.png", vendor: "Contoso Services", date: "2026-10-14", total: "$1,240.00", confidence: "87%" }
   ];
   return <main className="app-shell demo-shell">
-    <header className="topbar"><a className="brand" href={import.meta.env.BASE_URL}><span className="brand-mark"><ScanText size={21}/></span><span>SnapText</span></a><div className="topbar-note"><span className="demo-pill">INTERACTIVE UI PREVIEW</span><a className="signout-button" href="/">Back to app</a></div></header>
+    <header className="topbar"><a className="brand" href={import.meta.env.BASE_URL}><span className="brand-mark"><ScanText size={21}/></span><span>SnapText</span></a><div className="topbar-note"><span className="demo-pill">INTERACTIVE UI PREVIEW</span><a className="signout-button" href={import.meta.env.BASE_URL}>Back to app</a></div></header>
     <section className="demo-hero"><div className="eyebrow"><Sparkles size={15}/> PRODUCT DEMO</div><h1>From image files<br/><span>to reviewed data.</span></h1><p className="hero-copy">Explore the planned batch-review experience using sample records. This preview does not run OCR or upload files to a server.</p></section>
     <section className="demo-workspace">
       <div className="demo-section-head"><div><p className="section-kicker">BATCH WORKSPACE</p><h2>October expense records</h2><p className="section-copy">3 sample images · example data only</p></div><span className="demo-pill">SAMPLE DATA</span></div>
@@ -181,7 +181,7 @@ function App() {
     return (
       <main className="app-shell auth-shell">
         <header className="topbar">
-          <a className="brand" href="/" aria-label="SnapText home"><span className="brand-mark"><ScanText size={21} /></span><span>SnapText</span></a>
+          <a className="brand" href={import.meta.env.BASE_URL} aria-label="SnapText home"><span className="brand-mark"><ScanText size={21} /></span><span>SnapText</span></a>
           <span className="topbar-note">Customer workspace</span>
         </header>
         <section className="auth-panel">
@@ -291,7 +291,7 @@ function App() {
   return (
     <main className="app-shell">
       <header className="topbar">
-        <a className="brand" href="/" aria-label="SnapText home">
+        <a className="brand" href={import.meta.env.BASE_URL} aria-label="SnapText home">
           <span className="brand-mark"><ScanText size={21} /></span>
           <span>SnapText</span>
         </a>
