@@ -1,0 +1,40 @@
+name: Deploy static demo to GitHub Pages
+
+on:
+  push:
+    branches: [feature/ocr-benchmark-foundation]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: snaptext-demo-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build static demo preview
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build web app for GitHub Pages
+        run: npm --workspace @snaptext/web run build
+        env:
+          VITE_BASE_PATH: /snaptext/
+      - name: Publish static site to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: apps/web/dist
+          force_orphan: true
+          commit_message: 'deploy: publish static SnapText demo'
