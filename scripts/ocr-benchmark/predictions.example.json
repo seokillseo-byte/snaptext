@@ -1,0 +1,24 @@
+[
+  {
+    "id": "vi-clean-001",
+    "engine": "example-engine",
+    "engineVersion": "replace-with-pinned-version",
+    "text": "Nguyễn Văn An Hà Nội",
+    "fields": {
+      "fullName": "Nguyễn Văn An",
+      "city": "Hà Nội"
+    },
+    "latencyMs": 42
+  },
+  {
+    "id": "en-clean-001",
+    "engine": "example-engine",
+    "engineVersion": "replace-with-pinned-version",
+    "text": "Invoice Number INV-001",
+    "fields": {
+      "documentType": "Invoice",
+      "invoiceNumber": "INV-001"
+    },
+    "latencyMs": 39
+  }
+]
