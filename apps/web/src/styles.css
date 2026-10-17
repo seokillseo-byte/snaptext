@@ -131,3 +131,6 @@ h3{font-size:16px;font-weight:700;margin-bottom:8px}
 .demo-disclaimer{display:flex;align-items:flex-start;gap:8px;margin:17px 0 0;color:#93a2bb;font-size:11px;line-height:1.6}
 .demo-disclaimer svg{flex-shrink:0;color:#9ad9c2}
 @media(max-width:760px){.demo-workspace{padding:16px}.demo-columns{grid-template-columns:1fr}.demo-metrics{grid-template-columns:1fr}.demo-section-head{flex-direction:column}.demo-hero{padding:40px 0 25px}}
+
+.demo-link{display:inline-flex;align-items:center;gap:8px;color:#b7c4ff;font-size:12px;font-weight:700;padding:10px 0}
+.demo-link:hover{color:#fff;text-decoration:underline}

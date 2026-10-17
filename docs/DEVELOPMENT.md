@@ -12,7 +12,8 @@
 4. Apply schema migrations with npm run db:migrate.
 5. Run the API and web app with npm run dev.
 6. Open the Vite URL shown in the terminal (normally http://localhost:5173).
-7. Check API liveness at http://localhost:3001/api/health and database readiness at http://localhost:3001/api/health/ready.
+7. Open `http://localhost:5173/demo` to view the interactive UI preview. It uses illustrative sample rows only: it does not run OCR, send API requests, or upload selected files. This is a local development route, not a public hosted demo.
+8. Check API liveness at http://localhost:3001/api/health and database readiness at http://localhost:3001/api/health/ready.
 
 ## Authentication and API access
 

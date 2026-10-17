@@ -5,7 +5,7 @@ SnapText is a web application being built to turn batches of images into one str
 ## Current implementation
 
 Implemented and validated in GitHub Actions:
-- React + TypeScript + Vite web interface.
+- React + TypeScript + Vite web interface, including an interactive `/demo` route for exploring the proposed review UI with clearly labeled sample data.
 - Express + TypeScript API with liveness and PostgreSQL readiness checks.
 - PostgreSQL schema and checksum-verified SQL migrations.
 - Workspace and batch creation.
@@ -15,7 +15,7 @@ Implemented and validated in GitHub Actions:
 - Configurable file count, per-file size, and combined request-size limits.
 - Integration tests for valid image upload, fake image rejection, duplicate detection, request-size rejection, and temporary-file cleanup.
 
-Customer authentication screens and API are implemented on the current Draft PR: registration, email verification, login/logout, password reset, server-side sessions, and workspace membership enforcement. Session and one-time tokens are stored as hashes; expired and replayed tokens are rejected. Email delivery now has a Resend HTTPS API adapter for verification and password-reset messages. Configure `RESEND_API_KEY` and `RESEND_FROM_EMAIL` in the API environment and verify the sender domain in Resend before live use; without both values, delivery remains fail-closed. Adapter tests cover request shape, provider/network failures, and secret-safe error handling. A manual live-delivery smoke-test command is available: set `RESEND_TEST_TO_EMAIL` to a controlled inbox and run `npm --workspace @snaptext/api run email:smoke`; this sends a harmless message and never prints credentials. GitHub Actions must pass before the latest changes are considered validated. OCR and extraction have not been implemented yet.
+Customer authentication screens and API are implemented on the current Draft PR: registration, email verification, login/logout, password reset, server-side sessions, and workspace membership enforcement. Session and one-time tokens are stored as hashes; expired and replayed tokens are rejected. Email delivery now has a Resend HTTPS API adapter for verification and password-reset messages. Configure `RESEND_API_KEY` and `RESEND_FROM_EMAIL` in the API environment and verify the sender domain in Resend before live use; without both values, delivery remains fail-closed. Adapter tests cover request shape, provider/network failures, and secret-safe error handling. A manual live-delivery smoke-test command is available: set `RESEND_TEST_TO_EMAIL` to a controlled inbox and run `npm --workspace @snaptext/api run email:smoke`; this sends a harmless message and never prints credentials. GitHub Actions must pass before the latest changes are considered validated. The OCR benchmark harness runs Tesseract against synthetic fixtures and provides a manually triggered PaddleOCR workflow, but product OCR and extraction are not yet wired into the user-facing batch workflow. The `/demo` page is a UI preview using illustrative rows only.
 
 ### Latest branch additions — validated in GitHub Actions run 134
 - Paginated workspace, batch, and image list endpoints with total-count metadata.

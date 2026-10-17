@@ -303,6 +303,7 @@ function App() {
         <p className="hero-copy">Upload a batch, extract the fields you need, review uncertain values, and export everything in one clean file.</p>
         <div className="hero-actions">
           <a className="primary-action" href="#workspace">Start a batch <ArrowRight size={17} /></a>
+          <a className="demo-link" href="/demo">Explore interactive demo <ArrowRight size={15} /></a>
           <span className="privacy-note"><ShieldCheck size={15} /> Review before export</span>
         </div>
       </section>
