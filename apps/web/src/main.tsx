@@ -36,6 +36,36 @@ async function readJson(response: Response): Promise<Record<string, any>> {
   return payload;
 }
 
+
+function DemoApp() {
+  const [selected, setSelected] = useState<string[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const sampleRows = [
+    { file: "invoice_001.png", vendor: "Northwind Supplies", date: "2026-10-12", total: "$248.50", confidence: "98%" },
+    { file: "receipt_002.jpg", vendor: "Harbor Coffee", date: "2026-10-13", total: "$18.75", confidence: "94%" },
+    { file: "form_003.png", vendor: "Contoso Services", date: "2026-10-14", total: "$1,240.00", confidence: "87%" }
+  ];
+  return <main className="app-shell demo-shell">
+    <header className="topbar"><a className="brand" href="/"><span className="brand-mark"><ScanText size={21}/></span><span>SnapText</span></a><div className="topbar-note"><span className="demo-pill">INTERACTIVE UI PREVIEW</span><a className="signout-button" href="/">Back to app</a></div></header>
+    <section className="demo-hero"><div className="eyebrow"><Sparkles size={15}/> PRODUCT DEMO</div><h1>From image files<br/><span>to reviewed data.</span></h1><p className="hero-copy">Explore the planned batch-review experience using sample records. This preview does not run OCR or upload files to a server.</p></section>
+    <section className="demo-workspace">
+      <div className="demo-section-head"><div><p className="section-kicker">BATCH WORKSPACE</p><h2>October expense records</h2><p className="section-copy">3 sample images · example data only</p></div><span className="demo-pill">SAMPLE DATA</span></div>
+      <div className="demo-metrics">
+        <div className="demo-metric"><span>Images in batch</span><strong>{showResults ? 3 + selected.length : 3}</strong><small>Files queued for review</small></div>
+        <div className="demo-metric"><span>Fields extracted</span><strong>{showResults ? 12 : "—"}</strong><small>{showResults ? "Example values only" : "Run preview to reveal sample results"}</small></div>
+        <div className="demo-metric"><span>Needs review</span><strong>{showResults ? 1 : "—"}</strong><small>Low-confidence values flagged</small></div>
+      </div>
+      <div className="demo-columns">
+        <section className="demo-card"><div className="panel-heading"><UploadCloud size={18}/><h3>Add images to this demo</h3></div><label className="demo-drop"><FileImage size={23}/><strong>Choose local image files</strong><span>Files stay in this browser preview; no upload or OCR occurs.</span><input type="file" accept="image/*" multiple onChange={event=>{setSelected(Array.from(event.currentTarget.files ?? []).map(file=>file.name));setShowResults(false);}}/></label>{selected.length>0 && <div className="demo-selected"><strong>Selected files</strong>{selected.map(name=><span key={name}><FileImage size={14}/>{name}</span>)}</div>}<button className="primary-action upload-submit" type="button" onClick={()=>setShowResults(true)}><ScanText size={16}/> Show sample extraction results <ArrowRight size={16}/></button><p className="helper-text">The button reveals illustrative results for the sample batch. It does not process selected files.</p></section>
+        <section className="demo-card"><div className="panel-heading"><ShieldCheck size={18}/><h3>Review checklist</h3></div><ol className="steps"><li><span className="step-number">01</span><div><strong>Check extracted values</strong><p>Compare vendor, date, and total against the source image.</p></div></li><li><span className="step-number">02</span><div><strong>Resolve uncertain fields</strong><p>Low-confidence values should be confirmed by a person.</p></div></li><li><span className="step-number">03</span><div><strong>Export reviewed records</strong><p>Only verified values should be included in a final dataset.</p></div></li></ol></section>
+      </div>
+      <section className="demo-card demo-table-card"><div className="demo-section-head"><div><p className="section-kicker">EXTRACTION REVIEW</p><h2>Structured fields</h2></div><span className={showResults ? "review-badge" : "demo-pill"}>{showResults ? "EXAMPLE RESULTS" : "AWAITING PREVIEW"}</span></div><div className="demo-table-wrap"><table className="demo-table"><thead><tr><th>Source image</th><th>Vendor</th><th>Date</th><th>Total</th><th>Confidence</th><th>Review status</th></tr></thead><tbody>{(showResults ? sampleRows : []).map((row,index)=><tr key={row.file}><td>{row.file}</td><td>{row.vendor}</td><td>{row.date}</td><td>{row.total}</td><td>{row.confidence}</td><td><span className={index===2?"needs-review":"review-ok"}>{index===2?"Needs review":"Ready to verify"}</span></td></tr>)}{!showResults && <tr><td colSpan={6} className="demo-empty">Choose “Show sample extraction results” to view example rows.</td></tr>}</tbody></table></div></section>
+      <p className="demo-disclaimer"><ShieldCheck size={16}/> Demo only: all displayed OCR values are illustrative. No real OCR, API request, or file upload is performed on this page.</p>
+    </section>
+    <footer className="footer"><span>SnapText · Demo</span><span>Batch review UI concept · sample data only</span></footer>
+  </main>;
+}
+
 function App() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [workspaceName, setWorkspaceName] = useState("My workspace");
@@ -139,6 +169,8 @@ function App() {
       setErrorMessage("");
     }
   }
+
+  if (window.location.pathname === "/demo") return <DemoApp />;
 
   if (!authChecked) {
     return <main className="app-shell auth-shell"><section className="auth-panel"><div className="brand"><span className="brand-mark"><ScanText size={21} /></span><span>SnapText</span></div><p className="auth-muted">Checking your session…</p></section></main>;
