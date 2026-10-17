@@ -47,7 +47,7 @@ test("summarizes latency and ignores failed records for accuracy", () => {
   ]);
   assert.equal(summary.failureRate, 1 / 3);
   assert.equal(summary.meanCer, 0.2);
-  assert.equal(summary.meanWer, 0.3);
+  assert.ok(Math.abs(summary.meanWer - 0.3) < Number.EPSILON * 2);
   assert.equal(summary.meanFieldAccuracy, 0.75);
   assert.equal(summary.medianLatencyMs, 10);
   assert.equal(summary.p95LatencyMs, 30);
