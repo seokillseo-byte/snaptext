@@ -84,7 +84,7 @@ export function summarize(scores) {
     const values = successful.map((score) => score[key]).filter(Number.isFinite);
     return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
   };
-  const latencies = successful.map((score) => score.latencyMs).filter(Number.isFinite);
+  // Latency measures engine execution, so failed runs still contribute when timing is available.\n  const latencies = scores.map((score) => score.latencyMs).filter(Number.isFinite);
   return {
     fixtureCount: scores.length,
     failureRate: scores.length ? scores.filter((score) => score.failed).length / scores.length : 0,

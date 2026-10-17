@@ -43,7 +43,7 @@ test("summarizes latency and ignores failed records for accuracy", () => {
   const summary = summarize([
     { failed: false, cer: 0.1, wer: 0.2, fieldAccuracy: 1, latencyMs: 10 },
     { failed: false, cer: 0.3, wer: 0.4, fieldAccuracy: 0.5, latencyMs: 30 },
-    { failed: true, cer: null, wer: null, fieldAccuracy: null, latencyMs: null }
+    { failed: true, cer: null, wer: null, fieldAccuracy: null, latencyMs: 50 }
   ]);
   assert.equal(summary.failureRate, 1 / 3);
   assert.equal(summary.meanCer, 0.2);
