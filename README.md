@@ -5,7 +5,7 @@ SnapText is a web application being built to turn batches of images into one str
 ## Current implementation
 
 Implemented and validated in GitHub Actions:
-- React + TypeScript + Vite web interface, including an interactive `/demo` route for exploring the proposed review UI with clearly labeled sample data.
+- React + TypeScript + Vite web interface, including an interactive `/demo` route and static GitHub Pages preview (`?demo=1`) with clearly labeled sample data.
 - Express + TypeScript API with liveness and PostgreSQL readiness checks.
 - PostgreSQL schema and checksum-verified SQL migrations.
 - Workspace and batch creation.

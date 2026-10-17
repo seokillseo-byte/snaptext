@@ -46,7 +46,7 @@ function DemoApp() {
     { file: "form_003.png", vendor: "Contoso Services", date: "2026-10-14", total: "$1,240.00", confidence: "87%" }
   ];
   return <main className="app-shell demo-shell">
-    <header className="topbar"><a className="brand" href="/"><span className="brand-mark"><ScanText size={21}/></span><span>SnapText</span></a><div className="topbar-note"><span className="demo-pill">INTERACTIVE UI PREVIEW</span><a className="signout-button" href="/">Back to app</a></div></header>
+    <header className="topbar"><a className="brand" href={import.meta.env.BASE_URL}><span className="brand-mark"><ScanText size={21}/></span><span>SnapText</span></a><div className="topbar-note"><span className="demo-pill">INTERACTIVE UI PREVIEW</span><a className="signout-button" href="/">Back to app</a></div></header>
     <section className="demo-hero"><div className="eyebrow"><Sparkles size={15}/> PRODUCT DEMO</div><h1>From image files<br/><span>to reviewed data.</span></h1><p className="hero-copy">Explore the planned batch-review experience using sample records. This preview does not run OCR or upload files to a server.</p></section>
     <section className="demo-workspace">
       <div className="demo-section-head"><div><p className="section-kicker">BATCH WORKSPACE</p><h2>October expense records</h2><p className="section-copy">3 sample images · example data only</p></div><span className="demo-pill">SAMPLE DATA</span></div>
@@ -88,6 +88,7 @@ function App() {
   const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
 
   useEffect(() => {
+    if (window.location.pathname.endsWith("/demo") || new URLSearchParams(window.location.search).get("demo") === "1") return;
     fetch("/api/auth/me")
       .then(async (response) => {
         if (!response.ok) return null;
@@ -170,7 +171,7 @@ function App() {
     }
   }
 
-  if (window.location.pathname === "/demo") return <DemoApp />;
+  if (window.location.pathname.endsWith("/demo") || new URLSearchParams(window.location.search).get("demo") === "1") return <DemoApp />;
 
   if (!authChecked) {
     return <main className="app-shell auth-shell"><section className="auth-panel"><div className="brand"><span className="brand-mark"><ScanText size={21} /></span><span>SnapText</span></div><p className="auth-muted">Checking your session…</p></section></main>;
@@ -303,7 +304,7 @@ function App() {
         <p className="hero-copy">Upload a batch, extract the fields you need, review uncertain values, and export everything in one clean file.</p>
         <div className="hero-actions">
           <a className="primary-action" href="#workspace">Start a batch <ArrowRight size={17} /></a>
-          <a className="demo-link" href="/demo">Explore interactive demo <ArrowRight size={15} /></a>
+          <a className="demo-link" href={`${import.meta.env.BASE_URL}?demo=1`}>Explore interactive demo <ArrowRight size={15} /></a>
           <span className="privacy-note"><ShieldCheck size={15} /> Review before export</span>
         </div>
       </section>
