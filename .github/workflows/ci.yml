@@ -75,6 +75,25 @@ jobs:
           path: artifacts/ocr-benchmark/
           if-no-files-found: error
           retention-days: 14
+      - name: Install Tesseract and English/Vietnamese language data
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes tesseract-ocr tesseract-ocr-eng tesseract-ocr-vie
+          tesseract --version
+          tesseract --list-langs
+      - name: Run real Tesseract benchmark on rasterized fixtures
+        run: |
+          node scripts/ocr-benchmark/benchmark-runner.mjs --engine tesseract --manifest artifacts/ocr-benchmark/raster-manifest.json --passes 3 --output artifacts/ocr-benchmark/predictions-tesseract.json --raw-output artifacts/ocr-benchmark/runs-tesseract.json
+          node scripts/ocr-benchmark/extract-fields.mjs --manifest scripts/ocr-benchmark/manifest.example.json --predictions artifacts/ocr-benchmark/predictions-tesseract.json --output artifacts/ocr-benchmark/predictions-tesseract-fields.json
+          node scripts/ocr-benchmark/score.mjs scripts/ocr-benchmark/manifest.example.json artifacts/ocr-benchmark/predictions-tesseract-fields.json > artifacts/ocr-benchmark/score-tesseract.json
+      - name: Upload real OCR benchmark results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocr-benchmark-tesseract-results
+          path: artifacts/ocr-benchmark/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Typecheck
         run: npm run typecheck
       - name: Build
