@@ -10,8 +10,8 @@ permissions:
   contents: read
 
 concurrency:
-  # Share one concurrency group between push and PR events for the same head branch.
-  group: snaptext-ci-${{ github.event.pull_request.head.ref || github.ref_name }}
+  # Push and pull_request both fire for PR branches; keep their runs separate so a queued PR run cannot cancel the push run (or vice versa).
+  group: snaptext-ci-${{ github.event_name }}-${{ github.event.pull_request.head.ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
