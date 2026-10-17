@@ -1,38 +1,138 @@
 {
   "schemaVersion": 1,
-  "notes": "Synthetic SVG source fixtures for reproducible OCR tests. Rasterize to PNG/TIFF before passing to OCR engines; these fixtures contain no customer data.",
+  "notes": "Eight deterministic synthetic SVG source fixtures for reproducible OCR smoke tests. Rasterize to PNG/TIFF with pinned settings before OCR; these fixtures contain no customer data and are not a representative production dataset.",
   "fixtures": [
     {
       "id": "vi-clean-001",
       "language": "vi",
-      "scenario": ["clean", "printed", "synthetic"],
+      "scenario": [
+        "clean",
+        "printed",
+        "synthetic"
+      ],
       "image": "fixtures/vi-clean-001.svg",
       "groundTruthText": "Nguyễn Văn An Địa chỉ: Hà Nội Mã hồ sơ: VN-001",
-      "groundTruthFields": { "fullName": "Nguyễn Văn An", "city": "Hà Nội", "recordId": "VN-001" }
+      "groundTruthFields": {
+        "fullName": "Nguyễn Văn An",
+        "city": "Hà Nội",
+        "recordId": "VN-001"
+      }
     },
     {
       "id": "vi-low-contrast-001",
       "language": "vi",
-      "scenario": ["low-contrast", "printed", "synthetic"],
+      "scenario": [
+        "low-contrast",
+        "printed",
+        "synthetic"
+      ],
       "image": "fixtures/vi-low-contrast-001.svg",
       "groundTruthText": "Cộng hòa xã hội chủ nghĩa Việt Nam Số định danh: 0123456789 Ngày cấp: 17/10/2026",
-      "groundTruthFields": { "country": "Việt Nam", "identifier": "0123456789", "issueDate": "17/10/2026" }
+      "groundTruthFields": {
+        "country": "Việt Nam",
+        "identifier": "0123456789",
+        "issueDate": "17/10/2026"
+      }
     },
     {
       "id": "en-clean-001",
       "language": "en",
-      "scenario": ["clean", "printed", "synthetic"],
+      "scenario": [
+        "clean",
+        "printed",
+        "synthetic"
+      ],
       "image": "fixtures/en-clean-001.svg",
       "groundTruthText": "Invoice Number: INV-001 Total Due: 125.50 USD Due Date: 2026-11-15",
-      "groundTruthFields": { "documentType": "Invoice", "invoiceNumber": "INV-001", "totalDue": "125.50 USD", "dueDate": "2026-11-15" }
+      "groundTruthFields": {
+        "documentType": "Invoice",
+        "invoiceNumber": "INV-001",
+        "totalDue": "125.50 USD",
+        "dueDate": "2026-11-15"
+      }
     },
     {
       "id": "en-multiline-001",
       "language": "en",
-      "scenario": ["clean", "multi-line", "synthetic"],
+      "scenario": [
+        "clean",
+        "multi-line",
+        "synthetic"
+      ],
       "image": "fixtures/en-multiline-001.svg",
       "groundTruthText": "PURCHASE ORDER Order ID: PO-2048 Items: 12 Status: Pending",
-      "groundTruthFields": { "documentType": "PURCHASE ORDER", "orderId": "PO-2048", "items": "12", "status": "Pending" }
+      "groundTruthFields": {
+        "documentType": "PURCHASE ORDER",
+        "orderId": "PO-2048",
+        "items": "12",
+        "status": "Pending"
+      }
+    },
+    {
+      "id": "vi-rotated-001",
+      "language": "vi",
+      "scenario": [
+        "rotated",
+        "printed",
+        "synthetic"
+      ],
+      "image": "fixtures/vi-rotated-001.svg",
+      "groundTruthText": "PHIẾU TIẾP NHẬN HỒ SƠ Mã hồ sơ: HS-2048 Nơi tiếp nhận: Đà Nẵng",
+      "groundTruthFields": {
+        "documentType": "PHIẾU TIẾP NHẬN HỒ SƠ",
+        "recordId": "HS-2048",
+        "city": "Đà Nẵng"
+      }
+    },
+    {
+      "id": "en-blurred-001",
+      "language": "en",
+      "scenario": [
+        "blur",
+        "printed",
+        "synthetic"
+      ],
+      "image": "fixtures/en-blurred-001.svg",
+      "groundTruthText": "DELIVERY RECEIPT Tracking ID: TRK-581204 Pieces: 04 Status: Shipped",
+      "groundTruthFields": {
+        "documentType": "DELIVERY RECEIPT",
+        "trackingId": "TRK-581204",
+        "pieces": "04",
+        "status": "Shipped"
+      }
+    },
+    {
+      "id": "vi-serif-001",
+      "language": "vi",
+      "scenario": [
+        "serif-font",
+        "printed",
+        "synthetic"
+      ],
+      "image": "fixtures/vi-serif-001.svg",
+      "groundTruthText": "BIÊN NHẬN THANH TOÁN Số tiền: 1.250.000 VND Ngày: 17/10/2026",
+      "groundTruthFields": {
+        "documentType": "BIÊN NHẬN THANH TOÁN",
+        "amount": "1.250.000 VND",
+        "date": "17/10/2026"
+      }
+    },
+    {
+      "id": "en-small-text-001",
+      "language": "en",
+      "scenario": [
+        "small-text",
+        "printed",
+        "synthetic"
+      ],
+      "image": "fixtures/en-small-text-001.svg",
+      "groundTruthText": "ACCOUNT SUMMARY Account: AC-771902 Available balance: 804.16 USD Statement date: 2026-10-01",
+      "groundTruthFields": {
+        "documentType": "ACCOUNT SUMMARY",
+        "account": "AC-771902",
+        "balance": "804.16 USD",
+        "statementDate": "2026-10-01"
+      }
     }
   ]
 }
