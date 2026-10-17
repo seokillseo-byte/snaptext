@@ -1,28 +1,38 @@
 {
   "schemaVersion": 1,
-  "notes": "Example only. Replace with synthetic or properly licensed fixtures; do not add customer data.",
+  "notes": "Synthetic SVG source fixtures for reproducible OCR tests. Rasterize to PNG/TIFF before passing to OCR engines; these fixtures contain no customer data.",
   "fixtures": [
     {
       "id": "vi-clean-001",
       "language": "vi",
-      "scenario": ["clean", "printed"],
-      "image": "fixtures/vi-clean-001.png",
-      "groundTruthText": "Nguyễn Văn An  Hà Nội",
-      "groundTruthFields": {
-        "fullName": "Nguyễn Văn An",
-        "city": "Hà Nội"
-      }
+      "scenario": ["clean", "printed", "synthetic"],
+      "image": "fixtures/vi-clean-001.svg",
+      "groundTruthText": "Nguyễn Văn An Địa chỉ: Hà Nội Mã hồ sơ: VN-001",
+      "groundTruthFields": { "fullName": "Nguyễn Văn An", "city": "Hà Nội", "recordId": "VN-001" }
+    },
+    {
+      "id": "vi-low-contrast-001",
+      "language": "vi",
+      "scenario": ["low-contrast", "printed", "synthetic"],
+      "image": "fixtures/vi-low-contrast-001.svg",
+      "groundTruthText": "Cộng hòa xã hội chủ nghĩa Việt Nam Số định danh: 0123456789 Ngày cấp: 17/10/2026",
+      "groundTruthFields": { "country": "Việt Nam", "identifier": "0123456789", "issueDate": "17/10/2026" }
     },
     {
       "id": "en-clean-001",
       "language": "en",
-      "scenario": ["clean", "printed"],
-      "image": "fixtures/en-clean-001.png",
-      "groundTruthText": "Invoice Number INV-001",
-      "groundTruthFields": {
-        "documentType": "Invoice",
-        "invoiceNumber": "INV-001"
-      }
+      "scenario": ["clean", "printed", "synthetic"],
+      "image": "fixtures/en-clean-001.svg",
+      "groundTruthText": "Invoice Number: INV-001 Total Due: 125.50 USD Due Date: 2026-11-15",
+      "groundTruthFields": { "documentType": "Invoice", "invoiceNumber": "INV-001", "totalDue": "125.50 USD", "dueDate": "2026-11-15" }
+    },
+    {
+      "id": "en-multiline-001",
+      "language": "en",
+      "scenario": ["clean", "multi-line", "synthetic"],
+      "image": "fixtures/en-multiline-001.svg",
+      "groundTruthText": "PURCHASE ORDER Order ID: PO-2048 Items: 12 Status: Pending",
+      "groundTruthFields": { "documentType": "PURCHASE ORDER", "orderId": "PO-2048", "items": "12", "status": "Pending" }
     }
   ]
 }
