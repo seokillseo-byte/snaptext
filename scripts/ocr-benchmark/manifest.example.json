@@ -16,6 +16,11 @@
         "fullName": "Nguyễn Văn An",
         "city": "Hà Nội",
         "recordId": "VN-001"
+      },
+      "fieldPatterns": {
+        "fullName": "(?:^|\\n)\\s*(Nguyễn Văn An)",
+        "city": "Địa chỉ:\\s*([^\\r\\n]+)",
+        "recordId": "Mã hồ sơ:\\s*([A-Z]{2}-\\d+)"
       }
     },
     {
@@ -32,6 +37,11 @@
         "country": "Việt Nam",
         "identifier": "0123456789",
         "issueDate": "17/10/2026"
+      },
+      "fieldPatterns": {
+        "country": "Cộng hòa xã hội chủ nghĩa\\s*(Việt Nam)",
+        "identifier": "Số định danh:\\s*(\\d+)",
+        "issueDate": "Ngày cấp:\\s*(\\d{2}/\\d{2}/\\d{4})"
       }
     },
     {
@@ -49,6 +59,12 @@
         "invoiceNumber": "INV-001",
         "totalDue": "125.50 USD",
         "dueDate": "2026-11-15"
+      },
+      "fieldPatterns": {
+        "documentType": "^(Invoice)",
+        "invoiceNumber": "Invoice Number:\\s*([A-Z]+-\\d+)",
+        "totalDue": "Total Due:\\s*([\\d,.]+\\s+USD)",
+        "dueDate": "Due Date:\\s*(\\d{4}-\\d{2}-\\d{2})"
       }
     },
     {
@@ -66,6 +82,12 @@
         "orderId": "PO-2048",
         "items": "12",
         "status": "Pending"
+      },
+      "fieldPatterns": {
+        "documentType": "^(PURCHASE ORDER)",
+        "orderId": "Order ID:\\s*([A-Z]+-\\d+)",
+        "items": "Items:\\s*(\\d+)",
+        "status": "Status:\\s*([A-Za-z]+)"
       }
     },
     {
@@ -82,6 +104,11 @@
         "documentType": "PHIẾU TIẾP NHẬN HỒ SƠ",
         "recordId": "HS-2048",
         "city": "Đà Nẵng"
+      },
+      "fieldPatterns": {
+        "documentType": "^(PHIẾU TIẾP NHẬN HỒ SƠ)",
+        "recordId": "Mã hồ sơ:\\s*([A-Z]{2}-\\d+)",
+        "city": "Nơi tiếp nhận:\\s*([^\\r\\n]+)"
       }
     },
     {
@@ -99,6 +126,12 @@
         "trackingId": "TRK-581204",
         "pieces": "04",
         "status": "Shipped"
+      },
+      "fieldPatterns": {
+        "documentType": "^(DELIVERY RECEIPT)",
+        "trackingId": "Tracking ID:\\s*([A-Z]+-\\d+)",
+        "pieces": "Pieces:\\s*(\\d+)",
+        "status": "Status:\\s*([A-Za-z]+)"
       }
     },
     {
@@ -115,6 +148,11 @@
         "documentType": "BIÊN NHẬN THANH TOÁN",
         "amount": "1.250.000 VND",
         "date": "17/10/2026"
+      },
+      "fieldPatterns": {
+        "documentType": "^(BIÊN NHẬN THANH TOÁN)",
+        "amount": "Số tiền:\\s*([\\d.]+\\s+VND)",
+        "date": "Ngày:\\s*(\\d{2}/\\d{2}/\\d{4})"
       }
     },
     {
@@ -132,6 +170,58 @@
         "account": "AC-771902",
         "balance": "804.16 USD",
         "statementDate": "2026-10-01"
+      },
+      "fieldPatterns": {
+        "documentType": "^(ACCOUNT SUMMARY)",
+        "account": "Account:\\s*([A-Z]+-\\d+)",
+        "balance": "Available balance:\\s*([\\d.]+\\s+USD)",
+        "statementDate": "Statement date:\\s*(\\d{4}-\\d{2}-\\d{2})"
+      }
+    },
+    {
+      "id": "en-perspective-001",
+      "language": "en",
+      "scenario": [
+        "phone-photo",
+        "perspective",
+        "synthetic"
+      ],
+      "image": "fixtures/en-perspective-001.svg",
+      "groundTruthText": "SERVICE REPORT Reference: SR-9081 Site: North Warehouse Priority: High",
+      "groundTruthFields": {
+        "documentType": "SERVICE REPORT",
+        "reference": "SR-9081",
+        "site": "North Warehouse",
+        "priority": "High"
+      },
+      "fieldPatterns": {
+        "documentType": "^(SERVICE REPORT)",
+        "reference": "Reference:\\s*([A-Z]+-\\d+)",
+        "site": "Site:\\s*([^\\r\\n]+)",
+        "priority": "Priority:\\s*([A-Za-z]+)"
+      }
+    },
+    {
+      "id": "vi-mixed-fonts-001",
+      "language": "vi",
+      "scenario": [
+        "mixed-fonts",
+        "skew",
+        "synthetic"
+      ],
+      "image": "fixtures/vi-mixed-fonts-001.svg",
+      "groundTruthText": "PHIẾU GIAO NHẬN Mã phiếu: GN-3307 Đơn vị: Kho Hà Nội Trạng thái: Đã nhận",
+      "groundTruthFields": {
+        "documentType": "PHIẾU GIAO NHẬN",
+        "recordId": "GN-3307",
+        "site": "Kho Hà Nội",
+        "status": "Đã nhận"
+      },
+      "fieldPatterns": {
+        "documentType": "^(PHIẾU GIAO NHẬN)",
+        "recordId": "Mã phiếu:\\s*([A-Z]{2}-\\d+)",
+        "site": "Đơn vị:\\s*([^\\r\\n]+)",
+        "status": "Trạng thái:\\s*([^\\r\\n]+)"
       }
     }
   ]

@@ -63,7 +63,7 @@ jobs:
       - name: Run API tests
         run: npm test
       - name: Run OCR benchmark scorer and engine adapter tests
-        run: node --test scripts/ocr-benchmark/score.test.mjs scripts/ocr-benchmark/score-cli.test.mjs scripts/ocr-benchmark/engine-adapters.test.mjs
+        run: node --test scripts/ocr-benchmark/score.test.mjs scripts/ocr-benchmark/score-cli.test.mjs scripts/ocr-benchmark/engine-adapters.test.mjs scripts/ocr-benchmark/extract-fields.test.mjs
       - name: Validate OCR benchmark fixtures
         run: node --test scripts/ocr-benchmark/validate-manifest.test.mjs && node scripts/ocr-benchmark/validate-manifest.mjs
       - name: Rasterize OCR fixtures and record hashes
