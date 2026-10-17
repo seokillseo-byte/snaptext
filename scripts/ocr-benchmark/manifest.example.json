@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "notes": "Eight deterministic synthetic SVG source fixtures for reproducible OCR smoke tests. Rasterize to PNG/TIFF with pinned settings before OCR; these fixtures contain no customer data and are not a representative production dataset.",
+  "notes": "Ten deterministic synthetic SVG source fixtures for reproducible OCR smoke tests. Rasterize to PNG/TIFF with pinned settings before OCR; these fixtures contain no customer data and are not a representative production dataset.",
   "fixtures": [
     {
       "id": "vi-clean-001",

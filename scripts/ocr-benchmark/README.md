@@ -12,7 +12,11 @@ python -m pip install --requirement scripts/ocr-benchmark/requirements-rasterize
 python scripts/ocr-benchmark/rasterize.py
 node scripts/ocr-benchmark/benchmark-runner.mjs --engine tesseract --manifest artifacts/ocr-benchmark/raster-manifest.json --passes 3 --output artifacts/ocr-benchmark/predictions-tesseract.json --raw-output artifacts/ocr-benchmark/runs-tesseract.json
 node scripts/ocr-benchmark/extract-fields.mjs --manifest scripts/ocr-benchmark/manifest.example.json --predictions artifacts/ocr-benchmark/predictions-tesseract.json --output artifacts/ocr-benchmark/predictions-tesseract-fields.json
-node scripts/ocr-benchmark/score.mjs scripts/ocr-benchmark/manifest.example.json artifacts/ocr-benchmark/predictions-tesseract-fields.json
+node scripts/ocr-benchmark/score.mjs scripts/ocr-benchmark/manifest.example.json artifacts/ocr-benchmark/predictions-tesseract-fields.json > artifacts/ocr-benchmark/score-tesseract.json
+node scripts/ocr-benchmark/benchmark-runner.mjs --engine paddleocr --manifest artifacts/ocr-benchmark/raster-manifest.json --passes 3 --output artifacts/ocr-benchmark/predictions-paddleocr.json --raw-output artifacts/ocr-benchmark/runs-paddleocr.json
+node scripts/ocr-benchmark/extract-fields.mjs --manifest scripts/ocr-benchmark/manifest.example.json --predictions artifacts/ocr-benchmark/predictions-paddleocr.json --output artifacts/ocr-benchmark/predictions-paddleocr-fields.json
+node scripts/ocr-benchmark/score.mjs scripts/ocr-benchmark/manifest.example.json artifacts/ocr-benchmark/predictions-paddleocr-fields.json > artifacts/ocr-benchmark/score-paddleocr.json
+node scripts/ocr-benchmark/compare-reports.mjs --tesseract artifacts/ocr-benchmark/score-tesseract.json --paddleocr artifacts/ocr-benchmark/score-paddleocr.json --output artifacts/ocr-benchmark/comparison.json
 ```
 
 Repeat the benchmark command with `--engine paddleocr` and distinct output paths to compare engines on the same rasterized fixtures.
