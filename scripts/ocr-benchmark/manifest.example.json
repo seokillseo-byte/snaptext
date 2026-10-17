@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "notes": "Example only. Replace with synthetic or properly licensed fixtures; do not add customer data.",
+  "fixtures": [
+    {
+      "id": "vi-clean-001",
+      "language": "vi",
+      "scenario": ["clean", "printed"],
+      "image": "fixtures/vi-clean-001.png",
+      "groundTruthText": "Nguyễn Văn An  Hà Nội",
+      "groundTruthFields": {
+        "fullName": "Nguyễn Văn An",
+        "city": "Hà Nội"
+      }
+    },
+    {
+      "id": "en-clean-001",
+      "language": "en",
+      "scenario": ["clean", "printed"],
+      "image": "fixtures/en-clean-001.png",
+      "groundTruthText": "Invoice Number INV-001",
+      "groundTruthFields": {
+        "documentType": "Invoice",
+        "invoiceNumber": "INV-001"
+      }
+    }
+  ]
+}
