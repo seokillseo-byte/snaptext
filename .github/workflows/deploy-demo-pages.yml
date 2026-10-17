@@ -32,10 +32,8 @@ jobs:
         run: npm --workspace @snaptext/web run build
         env:
           VITE_BASE_PATH: /snaptext/
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
+      # Pages source is configured manually in repository Settings.
+      # Skip configure-pages because the token cannot create/read the Pages site.
       - name: Upload static site
         uses: actions/upload-pages-artifact@v3
         with:
